@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir -p ~/.local/share/fonts
+cp assets/fonts/Press_Start_2P/PressStart2P-Regular.ttf ~/.local/share/fonts/
+
