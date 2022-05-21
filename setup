@@ -3,3 +3,5 @@
 mkdir -p ~/.local/share/fonts
 cp assets/fonts/Press_Start_2P/PressStart2P-Regular.ttf ~/.local/share/fonts/
 
+source .env/bin/activate
+pip install -r requirements.txt
