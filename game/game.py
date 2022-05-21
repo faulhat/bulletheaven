@@ -16,8 +16,14 @@ class Game(arcade.Window):
         self.fps = 0
         self.counter = 0
         self.n_frames = 0
-        self.fps_label = arcade.Text(f"FPS:   ", 900, 30, font_size=14, font_name="PressStart2P", anchor_x="right")
-        self.copylabel = arcade.Text("(C) Thomas Faulhaber, 2022", 10, 30, font_size=14, font_name="PressStart2P")
+        self.fps_label = arcade.Text(
+            f"FPS:   ",
+            900,
+            30,
+            font_size=14,
+            font_name="PressStart2P",
+            anchor_x="right",
+        )
 
     def setup(self):
         self.show_view(mainmenu.MainMenu())
@@ -39,7 +45,7 @@ class Game(arcade.Window):
         self.clear()
         self.current_view.on_draw()
         self.fps_label.draw()
-        self.copylabel.draw()
+
 
 def run_game():
     window = Game()

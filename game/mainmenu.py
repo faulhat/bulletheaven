@@ -10,12 +10,12 @@ class MenuItem:
         self.label = arcade.Text(f" {self.text}", *args, **kwargs)
         self.selected = False
         self.does = does
-    
+
     def select(self):
         if not self.selected:
             self.label.text = f"> {self.text}"
             self.selected = True
-    
+
     def deselect(self):
         if self.selected:
             self.label.text = f" {self.text}"
@@ -36,7 +36,7 @@ class MenuItems:
         self.items[self.selected].deselect()
         self.selected = i
         self.items[self.selected].select()
-    
+
     def decrement(self):
         if self.selected > 0:
             self.select(self.selected - 1)
@@ -44,7 +44,7 @@ class MenuItems:
     def increment(self):
         if self.selected < len(self.items) - 1:
             self.select(self.selected + 1)
-    
+
     def get(self) -> MenuItem:
         return self.items[self.selected]
 
@@ -61,7 +61,7 @@ class MainMenu(arcade.View):
     ]
 
     # Seconds between frames
-    INTERVAL = .5
+    INTERVAL = 0.5
 
     # Menu options
     OPTIONS = [
@@ -73,30 +73,43 @@ class MainMenu(arcade.View):
         super().__init__()
         self.counter = 0
         self.frame = 0
-        self.title_frames = [arcade.load_texture(os.path.join(MainMenu.TITLE_FRAMES_DIR, frame_file)) for frame_file in MainMenu.TITLE_FRAME_FILES]
+        self.title_frames = [
+            arcade.load_texture(os.path.join(MainMenu.TITLE_FRAMES_DIR, frame_file))
+            for frame_file in MainMenu.TITLE_FRAME_FILES
+        ]
 
-        self.options = MenuItems([
-            MenuItem(
-                "Start!",
-                lambda _: None,
-                start_x=200, start_y=280,
-                font_size=18, font_name="PressStart2P",
-            ),
-            MenuItem(
-                "Quit.",
-                lambda _: arcade.exit(),
-                start_x=200, start_y=240,
-                font_size=18, font_name="PressStart2P",
-            ),
-        ])
-    
+        self.options = MenuItems(
+            [
+                MenuItem(
+                    "Start!",
+                    lambda _: None,
+                    start_x=350,
+                    start_y=280,
+                    font_size=18,
+                    font_name="PressStart2P",
+                ),
+                MenuItem(
+                    "Quit.",
+                    lambda _: arcade.exit(),
+                    start_x=350,
+                    start_y=240,
+                    font_size=18,
+                    font_name="PressStart2P",
+                ),
+            ]
+        )
+
+        self.copylabel = arcade.Text(
+            "(C) Thomas Faulhaber, 2022", 10, 30, font_size=14, font_name="PressStart2P"
+        )
+
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.UP:
             self.options.decrement()
-        
+
         if symbol == arcade.key.DOWN:
             self.options.increment()
-        
+
         if symbol == arcade.key.ENTER:
             self.options.get().does(self)
 
@@ -107,19 +120,26 @@ class MainMenu(arcade.View):
         if self.counter >= MainMenu.INTERVAL:
             self.counter = 0
             self.frame = (self.frame + 1) % len(self.title_frames)
-    
+
     def on_draw(self):
         arcade.draw_texture_rectangle(
-            self.window.width // 2, self.window.height // 2,
-            self.window.width, self.window.height,
+            self.window.width // 2,
+            self.window.height // 2,
+            self.window.width,
+            self.window.height,
             self.title_frames[self.frame],
         )
 
         for option in self.options.items:
             option.label.draw()
 
-        arcade.draw_rectangle_filled(400, 350, 710, 10 * (1 + 5 ** 0.5) / 2, arcade.csscolor.WHITE)
-        arcade.draw_rectangle_filled(400, 150, 710, 10 * (1 + 5 ** 0.5) / 2, arcade.csscolor.WHITE)
-        arcade.draw_rectangle_filled(50, 250, 10, 200, arcade.csscolor.WHITE)
+        arcade.draw_rectangle_filled(
+            500, 350, 510, 10 * (1 + 5**0.5) / 2, arcade.csscolor.WHITE
+        )
+        arcade.draw_rectangle_filled(
+            500, 150, 510, 10 * (1 + 5**0.5) / 2, arcade.csscolor.WHITE
+        )
+        arcade.draw_rectangle_filled(250, 250, 10, 200, arcade.csscolor.WHITE)
         arcade.draw_rectangle_filled(750, 250, 10, 200, arcade.csscolor.WHITE)
-        
+
+        self.copylabel.draw()
