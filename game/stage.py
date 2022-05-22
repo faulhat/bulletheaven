@@ -12,11 +12,10 @@ class Stage(arcade.View):
         super().__init__()
         if not other:
             self.player = Player(
-                                    self.window.width / 2,
-                                    self.window.height / 3,
-                                    self.window.width - 20,
-                                    self.window.height - 30,
-                                )
+                self.window.width / 2,
+                self.window.height / 3,
+                self,
+            )
             self.enemies = arcade.SpriteList()
 
             # Sprite list for enemy bullets
@@ -122,8 +121,6 @@ class Stage(arcade.View):
         elif arcade.key.RIGHT in self.keys and arcade.key.LEFT not in self.keys:
             x += offset
 
-        x = min(self.window.width, max(0, x))
-        y = min(self.window.height, max(0, y))
         self.player.set_position(x, y)
 
         if self.player.invincible:

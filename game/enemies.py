@@ -42,8 +42,12 @@ class SeaStar(Enemy):
     def rand_next(self):
         self.angle_offset = random() * math.pi * 2
         self.prev_x, self.prev_y = self.next_x, self.next_y
-        self.next_x = random() * self.stage.window.width
-        self.next_y = (random() * 1 / 2 + 1 / 2) * self.stage.window.height
+        self.next_x = (
+            random() * (self.stage.window.width - 2 * self.width / 2) + self.width / 2
+        )
+        self.next_y = (random() * 1 / 2 + 1 / 2) * (
+            self.stage.window.height - 2 * self.width / 2
+        )
 
     def on_update(self, delta_time: float):
         self.stopwatch += delta_time

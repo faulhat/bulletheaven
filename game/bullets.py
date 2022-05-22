@@ -22,7 +22,6 @@ class Bullet(arcade.SpriteCircle):
     ):
         super().__init__(radius, color)
         self.set_position(x, y)
-        self.radius = radius
         self.angle = angle
         self.speed = speed
         self.stage = stage
@@ -38,9 +37,9 @@ class Bullet(arcade.SpriteCircle):
         self.set_position(x, y)
 
         if (
-            x > self.stage.window.width + self.radius
-            or x < -self.radius
-            or y > self.stage.window.height + self.radius
-            or y < -self.radius
+            x > self.stage.window.width + self.width / 2
+            or x < -self.width / 2
+            or y > self.stage.window.height + self.width / 2
+            or y < -self.width / 2
         ):
             self.remove_from_sprite_lists()
