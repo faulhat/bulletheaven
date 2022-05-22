@@ -1,17 +1,56 @@
 import math
 import arcade
 
+from bullets import Bullet
+from youwin import YouWin
+from gameover import GameOver
+
+
+class Player(arcade.SpriteCircle):
+    class FriendlyBullet(Bullet):
+        def __init__(self, x, y):
+            super().__init__(6, (65, 105, 255, 240), x, y, math.pi * 1/2, 600)
+
+    def __init__(self, init_x, init_y, hp_label_x, hp_label_y):
+        super().__init__(15, arcade.csscolor.ALICE_BLUE)
+        self.hp = 5
+        self.invincible = False
+        self.speed = 500
+        self.init_x = init_x
+        self.init_y = init_y
+        self.set_position(init_x, init_y)
+        self.hp_label = arcade.Text(
+            "HP: 5", hp_label_x, hp_label_y, anchor_x="right", font_name="PressStart2P"
+        )
+        self.dead = False
+        self.won = False
+        self.firing_stopwatch = 0
+
+    def set_hp(self, hp: int):
+        self.hp = hp
+        self.hp_label.text = f"HP: {hp}"
+
 
 class Stage(arcade.View):
     def __init__(self):
         super().__init__()
-        self.player = arcade.SpriteCircle(15, arcade.csscolor.ALICE_BLUE)
-        self.player.set_position(self.window.width / 2, self.window.height / 3)
+        self.player = Player(
+            self.window.width / 2,
+            self.window.height / 3,
+            self.window.width - 20,
+            self.window.height - 30,
+        )
 
-        self.player_speed = 500
         self.enemies = arcade.SpriteList()
+
+        # Sprite list for enemy bullets
         self.bullets = arcade.SpriteList()
+
+        # Sprite list for the player's bullets
+        self.friendly = arcade.SpriteList()
+
         self.keys = set()
+        self.stopwatch = 0
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.keys.add(symbol)
@@ -22,13 +61,23 @@ class Stage(arcade.View):
         return super().on_key_release(_symbol, _modifiers)
 
     def on_update(self, delta_time: float):
-        for enemy in self.enemies:
-            enemy.on_update(delta_time)
-        
-        for bullet in self.bullets:
-            bullet.on_update(delta_time)
+        self.stopwatch += delta_time
+        self.player.firing_stopwatch += delta_time
 
-        true_player_speed = self.player_speed
+        if self.player.dead:
+            if self.stopwatch > 1:
+                self.window.show_view(GameOver())
+
+            return
+        elif self.player.won:
+            if self.stopwatch > 1:
+                self.window.show_view(YouWin())
+
+        self.enemies.on_update(delta_time)
+        self.bullets.on_update(delta_time)
+        self.friendly.on_update(delta_time)
+
+        true_player_speed = self.player.speed
         if arcade.key.MOD_SHIFT in self.keys:
             true_player_speed /= 2
 
@@ -62,7 +111,50 @@ class Stage(arcade.View):
         y = min(self.window.height, max(0, y))
         self.player.set_position(x, y)
 
+        if self.player.invincible:
+            # Make player sprite blink while invincible
+            blink_clock = int(self.stopwatch * 5) % 2
+            if blink_clock == 0:
+                self.player.color = arcade.csscolor.ORANGE
+            if blink_clock == 1:
+                self.player.color = arcade.csscolor.ALICE_BLUE
+
+            if self.stopwatch > 3:
+                self.player.invincible = False
+                self.player.color = arcade.csscolor.ALICE_BLUE
+        else:
+            # The player fires a steady stream of bullets when not invincible
+            if self.player.firing_stopwatch > 0.1:
+                self.friendly.append(Player.FriendlyBullet(self.player.position[0], self.player.position[1] + 20))
+                self.player.firing_stopwatch = 0
+
+        if not self.player.invincible and (self.player.collides_with_list(self.bullets) or self.player.collides_with_list(self.enemies)):
+            if self.player.hp - 1 == 0:
+                # The player is dead
+                self.player.dead = True
+                self.player.color = arcade.csscolor.PALE_VIOLET_RED
+                self.stopwatch = 0
+
+            self.bullets.clear()
+            self.player.set_hp(self.player.hp - 1)
+            self.player.set_position(self.player.init_x, self.player.init_y)
+            self.player.invincible = True
+            self.stopwatch = 0
+        
+        for enemy in self.enemies:
+            if enemy.collides_with_list(self.friendly):
+                if enemy.hp - 1 == 0:
+                    enemy.remove_from_sprite_lists()
+                    if len(self.enemies) == 0:
+                        self.bullets.clear()
+                        self.player.won = True
+                        self.stopwatch = 0
+                else:
+                    enemy.hp -= 1
+
     def on_draw(self):
         self.player.draw()
         self.enemies.draw()
         self.bullets.draw()
+        self.friendly.draw()
+        self.player.hp_label.draw()
