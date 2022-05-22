@@ -35,7 +35,7 @@ class Enemy(arcade.SpriteCircle):
 
 
 class SeaStar(Enemy):
-    def __init__(self, x: float, y: float, stage: Stage):
+    def __init__(self, x: float, y: float, stage: Stage, n_spines: int = 5):
         super().__init__(15, arcade.csscolor.VIOLET, x, y, stage, 15)
         self.stopwatch = 0
         self.counter = 0
@@ -43,6 +43,7 @@ class SeaStar(Enemy):
         self.angle_offset = 0
         self.next_x, self.next_y = self.position
         self.rand_next()
+        self.n_spines = n_spines
 
     def rand_next(self):
         self.angle_offset = random() * math.pi * 2
@@ -62,15 +63,15 @@ class SeaStar(Enemy):
                 y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch
                 self.set_position(x, y)
         else:
-            if self.stopwatch > 1 / 4:
+            if self.stopwatch > 1 / 6:
                 self.stopwatch = 0
                 self.counter += 1
-                if self.counter == 4:
+                if self.counter == 6:
                     self.shooting = False
                     self.rand_next()
                 else:
-                    for i in range(4):
-                        angle = self.angle_offset + math.pi * 2 / 4 * i
+                    for i in range(self.n_spines):
+                        angle = self.angle_offset + math.pi * 2 / self.n_spines * i
                         x = self.position[0] + math.cos(angle) * 2
                         y = self.position[1] + math.sin(angle) * 2
                         BasicBullet(x, y, angle, self.stage)
@@ -107,7 +108,7 @@ class DualWielder(Enemy):
             return
 
         self.stopwatch += delta_time
-        if self.stopwatch > 0.35:
+        if self.stopwatch > 0.4:
             self.stopwatch = 0
             if self.switch == 0:
                 x = self.position[0] - 18

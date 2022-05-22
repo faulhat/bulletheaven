@@ -54,6 +54,7 @@ class Stage(arcade.View):
 
         self.keys = set()
         self.stopwatch = 0
+        self.stage_stopwatch = 0
         self.transition_label = arcade.Text("Stage 1", self.window.width / 2, self.window.height / 2, font_size=20, anchor_x="center", anchor_y="center", font_name="PressStart2P")
         self.in_transition = True
         self.stage = 1
@@ -67,11 +68,12 @@ class Stage(arcade.View):
     
     def start_stage(self):
         self.in_transition = False
+        self.stage_stopwatch = 0
         if self.stage == 1:
             SeaStar(100, self.window.height + 15, self)
             SeaStar(self.window.width - 100, self.window.height + 15, self)
         elif self.stage == 2:
-            SeaStar(self.window.width / 2, self.window.height + 15, self)
+            SeaStar(self.window.width / 2, self.window.height + 15, self, n_spines=8)
             DualWielder(50, self)
             DualWielder(self.window.width - 50, self)
         elif self.stage == 3:
@@ -80,6 +82,21 @@ class Stage(arcade.View):
             DualWielder(self.window.width / 2, self)
             DualWielder(100, self)
             DualWielder(self.window.height - 100, self)
+    
+    def stage_update(self, delta_time: float):
+        self.stage_stopwatch += delta_time
+        if self.stage == 1:
+            pass
+        elif self.stage == 2:
+            if self.stage_stopwatch > 7:
+                self.stage_stopwatch = 0
+                DualWielder(50, self)
+                DualWielder(self.window.width - 50, self)
+        elif self.stage == 3:
+            if self.stage_stopwatch > 10:
+                self.stage_stopwatch = 0
+                if len(self.enemies) == 1:
+                    SeaStar(self.window.width / 2, self.window.height + 15, self)
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.keys.add(symbol)
@@ -99,7 +116,7 @@ class Stage(arcade.View):
 
             return
         elif self.in_transition:
-            if self.stopwatch > 1:
+            if self.stopwatch > 2:
                 if self.stage == 4:
                     self.window.show_view(YouWin())
                     return
@@ -107,6 +124,8 @@ class Stage(arcade.View):
                 self.start_stage()
         elif len(self.enemies) == 0:
             self.inc_stage()
+        else:
+            self.stage_update(delta_time)
 
         self.enemies.on_update(delta_time)
         self.bullets.on_update(delta_time)
