@@ -9,7 +9,6 @@ from stage import Stage
 class BasicBullet(Bullet):
     def __init__(self, x: float, y: float, angle: float, stage: Stage):
         super().__init__(8, arcade.csscolor.RED, x, y, angle, 300, stage)
-        stage.bullets.append(self)
 
 
 class Enemy(arcade.SpriteCircle):

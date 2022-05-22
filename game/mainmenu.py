@@ -34,14 +34,7 @@ class MainMenu(arcade.View):
                 MenuItem(
                     "Start!",
                     lambda _: self.window.show_view(
-                        StageOne(
-                            Player(
-                                self.window.width / 2,
-                                self.window.height / 3,
-                                self.window.width - 20,
-                                self.window.height - 30,
-                            )
-                        ),
+                        StageOne(),
                     ),
                     start_x=350,
                     start_y=280,

@@ -6,11 +6,11 @@ from youwin import YouWin
 
 
 class StageOne(Stage):
-    def __init__(self, player: Player):
-        super().__init__(player, 1, set())
+    def __init__(self):
+        super().__init__(1)
 
     def inc_stage(self):
-        self.window.show_view(StageTwo(self.player, self.keys))
+        self.window.show_view(StageTwo(self))
 
     def start_stage(self):
         super().start_stage()
@@ -22,11 +22,11 @@ class StageOne(Stage):
 
 
 class StageTwo(Stage):
-    def __init__(self, player: Player, keys: set):
-        super().__init__(player, 2, keys)
+    def __init__(self, previous: Stage):
+        super().__init__(2, previous)
 
     def inc_stage(self):
-        self.window.show_view(StageThree(self.player, self.keys))
+        self.window.show_view(StageThree(self))
 
     def start_stage(self):
         super().start_stage()
@@ -43,11 +43,11 @@ class StageTwo(Stage):
 
 
 class StageThree(Stage):
-    def __init__(self, player: Player, keys: set):
-        super().__init__(player, 3, keys)
+    def __init__(self, previous: Stage):
+        super().__init__(3, previous)
 
     def inc_stage(self):
-        self.window.show_view(StageFour(self.player, self.keys))
+        self.window.show_view(StageFour(self))
 
     def start_stage(self):
         super().start_stage()
@@ -66,8 +66,9 @@ class StageThree(Stage):
 
 
 class StageFour(Stage):
-    def __init__(self, player: Player, keys: set):
-        super().__init__(player, 4, keys)
+    def __init__(self, previous: Stage):
+        super().__init__(4, previous)
+        self.transition_label.text = "The End."
 
     def inc_stage(self):
         pass
@@ -77,6 +78,3 @@ class StageFour(Stage):
 
     def stage_update(self, delta_time: float):
         return super().stage_update(delta_time)
-
-    def on_draw(self):
-        self.player.draw()

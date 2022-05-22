@@ -2,6 +2,12 @@ import math
 import arcade
 
 
+# Forward declaration to prevent circular import
+class Stage(arcade.View):
+    friendly: arcade.SpriteList
+    bullets: arcade.SpriteList
+
+
 class Bullet(arcade.SpriteCircle):
     def __init__(
         self,
@@ -11,7 +17,8 @@ class Bullet(arcade.SpriteCircle):
         y: float,
         angle: float,
         speed: float,
-        stage: arcade.View,
+        stage: Stage,
+        friendly: bool = False,
     ):
         super().__init__(radius, color)
         self.set_position(x, y)
@@ -19,6 +26,11 @@ class Bullet(arcade.SpriteCircle):
         self.angle = angle
         self.speed = speed
         self.stage = stage
+
+        if friendly:
+            stage.friendly.append(self)
+        else:
+            stage.bullets.append(self)
 
     def on_update(self, delta_time: float):
         x = self.position[0] + math.cos(self.angle) * self.speed * delta_time

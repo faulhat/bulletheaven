@@ -7,7 +7,9 @@ from bullets import Bullet
 class Player(arcade.SpriteCircle):
     class FriendlyBullet(Bullet):
         def __init__(self, x: float, y: float, stage: arcade.View):
-            super().__init__(6, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage)
+            super().__init__(
+                6, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage, friendly=True
+            )
 
     def __init__(
         self, init_x: float, init_y: float, hp_label_x: float, hp_label_y: float

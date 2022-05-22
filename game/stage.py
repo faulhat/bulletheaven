@@ -1,29 +1,43 @@
 from abc import abstractmethod
 import math
+from typing import overload
 import arcade
 
-from bullets import Bullet
 from gameover import GameOver
 from player import Player
 
 
 class Stage(arcade.View):
-    def __init__(self, player: Player, stage_number: int, keys: set):
+    def __init__(self, stage_number: int, other: "Stage" = None):
         super().__init__()
-        self.player = player
-        self.enemies = arcade.SpriteList()
+        if not other:
+            self.player = Player(
+                                    self.window.width / 2,
+                                    self.window.height / 3,
+                                    self.window.width - 20,
+                                    self.window.height - 30,
+                                )
+            self.enemies = arcade.SpriteList()
 
-        # Sprite list for enemy bullets
-        self.bullets = arcade.SpriteList()
+            # Sprite list for enemy bullets
+            self.bullets = arcade.SpriteList()
 
-        # Sprite list for the player's bullets
-        self.friendly = arcade.SpriteList()
+            # Sprite list for the player's bullets
+            self.friendly = arcade.SpriteList()
 
-        self.keys = keys
+            self.keys = set()
+        else:
+            self.player = other.player
+            self.enemies = other.enemies
+            self.bullets = other.bullets
+            self.friendly = other.friendly
+            self.keys = other.keys
+
+        self.stage_number = stage_number
         self.stopwatch = 0
         self.stage_stopwatch = 0
         self.transition_label = arcade.Text(
-            f"Stage {stage_number}",
+            f"Stage {self.stage_number}",
             self.window.width / 2,
             self.window.height / 2,
             font_size=20,
@@ -32,7 +46,6 @@ class Stage(arcade.View):
             font_name="PressStart2P",
         )
         self.in_transition = True
-        self.stage = 1
 
     @abstractmethod
     def inc_stage(self):
@@ -67,7 +80,7 @@ class Stage(arcade.View):
         elif self.in_transition:
             if self.stopwatch > 2:
                 self.start_stage()
-        elif len(self.enemies) == 0:
+        elif len(self.enemies) == 0 and len(self.bullets) == 0:
             self.inc_stage()
         else:
             self.stage_update(delta_time)
@@ -127,10 +140,10 @@ class Stage(arcade.View):
         else:
             # The player fires a steady stream of bullets when not invincible
             if self.player.firing_stopwatch > 0.1:
-                self.friendly.append(
-                    Player.FriendlyBullet(
-                        self.player.position[0], self.player.position[1] + 20, self
-                    )
+                Player.FriendlyBullet(
+                    self.player.position[0],
+                    self.player.position[1] + 20,
+                    self,
                 )
                 self.player.firing_stopwatch = 0
 
