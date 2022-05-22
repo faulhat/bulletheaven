@@ -1,49 +1,16 @@
+from abc import abstractmethod
 import math
 import arcade
 
 from bullets import Bullet
-from enemies import DualWielder, SeaStar
-from youwin import YouWin
 from gameover import GameOver
-
-
-class Player(arcade.SpriteCircle):
-    class FriendlyBullet(Bullet):
-        def __init__(self, x: float, y: float, stage: arcade.View):
-            super().__init__(6, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage)
-
-    def __init__(
-        self, init_x: float, init_y: float, hp_label_x: float, hp_label_y: float
-    ):
-        super().__init__(15, arcade.csscolor.ALICE_BLUE)
-        self.hp = 5
-        self.invincible = False
-        self.speed = 500
-        self.init_x = init_x
-        self.init_y = init_y
-        self.set_position(init_x, init_y)
-        self.hp_label = arcade.Text(
-            "HP: 5", hp_label_x, hp_label_y, anchor_x="right", font_name="PressStart2P"
-        )
-        self.dead = False
-        self.slow = False
-        self.firing_stopwatch = 0
-
-    def set_hp(self, hp: int):
-        self.hp = hp
-        self.hp_label.text = f"HP: {hp}"
+from player import Player
 
 
 class Stage(arcade.View):
-    def __init__(self):
+    def __init__(self, player: Player, stage_number: int, keys: set):
         super().__init__()
-        self.player = Player(
-            self.window.width / 2,
-            self.window.height / 3,
-            self.window.width - 20,
-            self.window.height - 30,
-        )
-
+        self.player = player
         self.enemies = arcade.SpriteList()
 
         # Sprite list for enemy bullets
@@ -52,51 +19,33 @@ class Stage(arcade.View):
         # Sprite list for the player's bullets
         self.friendly = arcade.SpriteList()
 
-        self.keys = set()
+        self.keys = keys
         self.stopwatch = 0
         self.stage_stopwatch = 0
-        self.transition_label = arcade.Text("Stage 1", self.window.width / 2, self.window.height / 2, font_size=20, anchor_x="center", anchor_y="center", font_name="PressStart2P")
+        self.transition_label = arcade.Text(
+            f"Stage {stage_number}",
+            self.window.width / 2,
+            self.window.height / 2,
+            font_size=20,
+            anchor_x="center",
+            anchor_y="center",
+            font_name="PressStart2P",
+        )
         self.in_transition = True
         self.stage = 1
 
+    @abstractmethod
     def inc_stage(self):
-        self.bullets.clear()
-        self.stopwatch = 0
-        self.stage += 1
-        self.in_transition = True
-        self.transition_label.text = f"Stage {self.stage}"
-    
+        pass
+
+    @abstractmethod
     def start_stage(self):
         self.in_transition = False
         self.stage_stopwatch = 0
-        if self.stage == 1:
-            SeaStar(100, self.window.height + 15, self)
-            SeaStar(self.window.width - 100, self.window.height + 15, self)
-        elif self.stage == 2:
-            SeaStar(self.window.width / 2, self.window.height + 15, self, n_spines=8)
-            DualWielder(50, self)
-            DualWielder(self.window.width - 50, self)
-        elif self.stage == 3:
-            SeaStar(self.window.width / 2 - 20, self.window.height + 15, self)
-            SeaStar(self.window.width / 2 + 20, self.window.height + 15, self)
-            DualWielder(self.window.width / 2, self)
-            DualWielder(100, self)
-            DualWielder(self.window.height - 100, self)
-    
+
+    @abstractmethod
     def stage_update(self, delta_time: float):
         self.stage_stopwatch += delta_time
-        if self.stage == 1:
-            pass
-        elif self.stage == 2:
-            if self.stage_stopwatch > 7:
-                self.stage_stopwatch = 0
-                DualWielder(50, self)
-                DualWielder(self.window.width - 50, self)
-        elif self.stage == 3:
-            if self.stage_stopwatch > 10:
-                self.stage_stopwatch = 0
-                if len(self.enemies) == 1:
-                    SeaStar(self.window.width / 2, self.window.height + 15, self)
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.keys.add(symbol)
@@ -117,10 +66,6 @@ class Stage(arcade.View):
             return
         elif self.in_transition:
             if self.stopwatch > 2:
-                if self.stage == 4:
-                    self.window.show_view(YouWin())
-                    return
-                
                 self.start_stage()
         elif len(self.enemies) == 0:
             self.inc_stage()
@@ -201,7 +146,6 @@ class Stage(arcade.View):
 
             self.bullets.clear()
             self.player.set_hp(self.player.hp - 1)
-            self.player.set_position(self.player.init_x, self.player.init_y)
             self.player.invincible = True
             self.stopwatch = 0
 
@@ -219,5 +163,5 @@ class Stage(arcade.View):
         self.friendly.draw()
         self.player.hp_label.draw()
 
-        if self.in_transition and self.stage != 4:
+        if self.in_transition:
             self.transition_label.draw()

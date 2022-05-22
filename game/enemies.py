@@ -3,12 +3,7 @@ from random import random
 import arcade
 
 from bullets import Bullet
-
-
-# Forward declaration to avoid circular import
-class Stage(arcade.View):
-    bullets: arcade.SpriteList
-    enemies: arcade.SpriteList
+from stage import Stage
 
 
 class BasicBullet(Bullet):

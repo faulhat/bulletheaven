@@ -2,7 +2,9 @@ import os
 import arcade
 
 from menus import MenuItem, MenuItems
-from stage import Stage
+from stages import StageOne
+from player import Player
+
 
 class MainMenu(arcade.View):
     # Directory containing animation frames
@@ -31,7 +33,16 @@ class MainMenu(arcade.View):
             [
                 MenuItem(
                     "Start!",
-                    lambda _: self.window.show_view(Stage()),
+                    lambda _: self.window.show_view(
+                        StageOne(
+                            Player(
+                                self.window.width / 2,
+                                self.window.height / 3,
+                                self.window.width - 20,
+                                self.window.height - 30,
+                            )
+                        ),
+                    ),
                     start_x=350,
                     start_y=280,
                     font_size=18,
