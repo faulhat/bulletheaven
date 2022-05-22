@@ -32,14 +32,13 @@ class Game(arcade.Window):
         super().on_update(delta_time)
 
         self.counter += delta_time
+        self.n_frames += 1
         if self.counter > 1.0:
             self.fps = self.n_frames
             self.n_frames = 0
             self.counter = 0
 
             self.fps_label.text = f"FPS: {self.fps}"
-        else:
-            self.n_frames += 1
 
     def on_draw(self):
         self.clear()
