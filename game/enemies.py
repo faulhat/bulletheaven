@@ -41,7 +41,7 @@ class SimpleEnemy(arcade.SpriteCircle):
                 y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch
                 self.set_position(x, y)
         else:
-            if self.stopwatch > 1/8:
+            if self.stopwatch > 1 / 8:
                 self.stopwatch = 0
                 self.counter += 1
                 if self.counter == 8:
@@ -53,5 +53,5 @@ class SimpleEnemy(arcade.SpriteCircle):
                         x = self.position[0] + math.cos(angle) * 2
                         y = self.position[1] + math.sin(angle) * 2
                         self.stage.bullets.append(SimpleEnemy.SEBullet(x, y, angle))
-                    
+
                     self.angle_offset += math.pi * 2 / 60

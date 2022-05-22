@@ -9,7 +9,7 @@ from gameover import GameOver
 class Player(arcade.SpriteCircle):
     class FriendlyBullet(Bullet):
         def __init__(self, x, y):
-            super().__init__(6, (65, 105, 255, 240), x, y, math.pi * 1/2, 600)
+            super().__init__(6, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600)
 
     def __init__(self, init_x, init_y, hp_label_x, hp_label_y):
         super().__init__(15, arcade.csscolor.ALICE_BLUE)
@@ -24,6 +24,7 @@ class Player(arcade.SpriteCircle):
         )
         self.dead = False
         self.won = False
+        self.slow = False
         self.firing_stopwatch = 0
 
     def set_hp(self, hp: int):
@@ -78,8 +79,11 @@ class Stage(arcade.View):
         self.friendly.on_update(delta_time)
 
         true_player_speed = self.player.speed
-        if arcade.key.MOD_SHIFT in self.keys:
+        if arcade.key.S in self.keys:
+            self.slow = True
             true_player_speed /= 2
+        else:
+            self.slow = False
 
         offset = true_player_speed * delta_time
         diag_offset = offset * 1 / math.sqrt(2)
@@ -125,10 +129,17 @@ class Stage(arcade.View):
         else:
             # The player fires a steady stream of bullets when not invincible
             if self.player.firing_stopwatch > 0.1:
-                self.friendly.append(Player.FriendlyBullet(self.player.position[0], self.player.position[1] + 20))
+                self.friendly.append(
+                    Player.FriendlyBullet(
+                        self.player.position[0], self.player.position[1] + 20
+                    )
+                )
                 self.player.firing_stopwatch = 0
 
-        if not self.player.invincible and (self.player.collides_with_list(self.bullets) or self.player.collides_with_list(self.enemies)):
+        if not self.player.invincible and (
+            self.player.collides_with_list(self.bullets)
+            or self.player.collides_with_list(self.enemies)
+        ):
             if self.player.hp - 1 == 0:
                 # The player is dead
                 self.player.dead = True
@@ -140,7 +151,7 @@ class Stage(arcade.View):
             self.player.set_position(self.player.init_x, self.player.init_y)
             self.player.invincible = True
             self.stopwatch = 0
-        
+
         for enemy in self.enemies:
             if enemy.collides_with_list(self.friendly):
                 if enemy.hp - 1 == 0:
