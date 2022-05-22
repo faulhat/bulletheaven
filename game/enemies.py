@@ -12,7 +12,7 @@ class SimpleEnemy(arcade.SpriteCircle):
             super().__init__(8, arcade.csscolor.RED, x, y, angle, 300)
 
     def __init__(self, x: float, y: float, stage: Stage):
-        super().__init__(15, arcade.csscolor.ORANGE_RED)
+        super().__init__(15, arcade.csscolor.VIOLET)
         self.set_position(x, y)
         self.stage = stage
         self.stopwatch = 0
