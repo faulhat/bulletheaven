@@ -2,7 +2,7 @@ import os
 import arcade
 
 from menus import MenuItem, MenuItems
-from stages import StageOne
+from stages import L1Stage1
 
 
 class MainMenu(arcade.View):
@@ -33,7 +33,7 @@ class MainMenu(arcade.View):
                 MenuItem(
                     "Start!",
                     lambda _: self.window.show_view(
-                        StageOne(),
+                        L1Stage1(),
                     ),
                     start_x=350,
                     start_y=280,

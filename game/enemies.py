@@ -31,7 +31,7 @@ class Enemy(arcade.SpriteCircle):
 class SeaStar(Enemy):
     RADIUS = 15
 
-    def __init__(self, x: float, y: float, stage: Stage, n_spines: int = 5):
+    def __init__(self, x: float, y: float, stage: Stage, n_spines: int = 5, interval: float = 1, n_bullets: int = 6):
         super().__init__(SeaStar.RADIUS, arcade.csscolor.VIOLET, x, y, stage, 15)
         self.stopwatch = 0
         self.counter = 0
@@ -40,6 +40,8 @@ class SeaStar(Enemy):
         self.next_x, self.next_y = self.position
         self.rand_next()
         self.n_spines = n_spines
+        self.interval = interval
+        self.n_bullets = n_bullets
 
     def rand_next(self):
         self.angle_offset = random() * math.pi * 2
@@ -54,19 +56,19 @@ class SeaStar(Enemy):
     def on_update(self, delta_time: float):
         self.stopwatch += delta_time
         if not self.shooting:
-            if self.stopwatch > 1:
+            if self.stopwatch > self.interval:
                 self.stopwatch = 0
                 self.counter = 0
                 self.shooting = True
             else:
-                x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch
-                y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch
+                x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch/self.interval
+                y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch/self.interval
                 self.set_position(x, y)
         else:
-            if self.stopwatch > 1 / 6:
+            if self.stopwatch > self.interval / self.n_bullets:
                 self.stopwatch = 0
                 self.counter += 1
-                if self.counter == 6:
+                if self.counter > self.n_bullets:
                     self.shooting = False
                     self.rand_next()
                 else:

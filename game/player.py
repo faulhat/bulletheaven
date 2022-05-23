@@ -12,7 +12,7 @@ class Player(arcade.SpriteCircle):
             )
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
-        super().__init__(15, arcade.csscolor.ALICE_BLUE)
+        super().__init__(12, arcade.csscolor.ALICE_BLUE)
         self.stage = stage
         self.set_position(init_x, init_y)
 
