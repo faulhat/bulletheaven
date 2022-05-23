@@ -10,7 +10,7 @@ class Player(arcade.SpriteCircle):
     class FriendlyBullet(Bullet):
         def __init__(self, x: float, y: float, stage: arcade.View):
             super().__init__(
-                6, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage, friendly=True
+                8, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage, friendly=True
             )
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
@@ -23,7 +23,7 @@ class Player(arcade.SpriteCircle):
         self.hp_label = arcade.Text(
             f"HP: {self.hp}",
             stage.window.width - 30,
-            stage.window.height - 30,
+            stage.window.height - 70,
             anchor_x="right",
             font_name="PressStart2P",
             font_size=18,

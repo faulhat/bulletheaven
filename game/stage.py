@@ -165,10 +165,9 @@ class Stage(arcade.View):
         for enemy in self.enemies:
             hits = enemy.collides_with_list(self.friendly)
             if hits:
-                if enemy.hp - 1 == 0:
+                enemy.hp -= 1
+                if enemy.hp == 0:
                     enemy.remove_from_sprite_lists()
-                else:
-                    enemy.hp -= 1
 
                 for friendly_bullet in hits:
                     friendly_bullet.remove_from_sprite_lists()

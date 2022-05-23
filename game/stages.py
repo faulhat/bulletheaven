@@ -94,8 +94,13 @@ class L1Stage3(Stage):
             self.stage_stopwatch = 0
             if len(self.sea_stars) == 1 and self.counter < 3:
                 self.counter += 1
-                SeaStar(
-                    self.window.width / 2, self.window.height + 15, self, n_bullets=4
+                self.sea_stars.append(
+                    SeaStar(
+                        self.window.width / 2,
+                        self.window.height + 15,
+                        self,
+                        n_bullets=4,
+                    )
                 )
 
         self.new_enemy_clock += delta_time
@@ -109,8 +114,6 @@ class L1Stage3(Stage):
 
 
 class L1Stage4(Stage):
-    boss: SeaStar
-
     def __init__(self, previous: Stage):
         super().__init__(previous)
         self.transition_label.text = "Level One - Stage Four"
@@ -121,7 +124,7 @@ class L1Stage4(Stage):
         self.stage_stopwatch = 0
 
     def inc_stage(self):
-        self.window.show_view(L1Boss(self))
+        self.window.show_view(L1BossStage(self))
 
     def make_turrets(self):
         turret_a: Turret
@@ -142,10 +145,16 @@ class L1Stage4(Stage):
 
     def start_stage(self):
         super().start_stage()
-        self.boss = SeaStar(
-            self.window.width / 3, self.window.height + SeaStar.RADIUS, self, 3
+        miniboss = SeaStar(
+            self.window.width / 3,
+            self.window.height + SeaStar.RADIUS,
+            self,
+            2,
+            interval=1.5,
+            n_bullets=7,
+            double=True,
         )
-        self.boss.hp = 20
+        miniboss.hp = 20
 
         self.make_turrets()
 
@@ -162,29 +171,70 @@ class L1Stage4(Stage):
                 self.make_turrets()
 
 
-class L1Boss(Stage):
+class L1Boss(SeaStar):
+    INIT_HP = 30
+    HP_BAR_HEIGHT = 30
+
+    def __init__(self, stage: Stage):
+        super().__init__(
+            stage.window.width * 2 / 3,
+            stage.window.height + SeaStar.RADIUS,
+            stage,
+            n_bullets=5,
+            interval=0.7,
+            double=True,
+        )
+
+        self.hp = L1Boss.INIT_HP
+        self.hp_label = arcade.Text(
+            f"Boss HP: {L1Boss.INIT_HP}",
+            20,
+            self.stage.window.height - L1Boss.HP_BAR_HEIGHT / 2,
+            arcade.csscolor.RED,
+            font_size=18,
+            font_name="PressStart2P",
+            anchor_y="center",
+        )
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+        self.hp_label.text = f"Boss HP: {self.hp}"
+
+    def draw_hp_bar(self):
+        arcade.draw_rectangle_filled(
+            self.hp / L1Boss.INIT_HP * self.stage.window.width / 2,
+            self.stage.window.height - L1Boss.HP_BAR_HEIGHT / 2,
+            self.hp / L1Boss.INIT_HP * self.stage.window.width,
+            L1Boss.HP_BAR_HEIGHT,
+            arcade.csscolor.GREEN,
+        )
+
+        self.hp_label.draw()
+
+
+class L1BossStage(Stage):
+    boss: L1Boss
+
     def __init__(self, previous):
         super().__init__(previous)
-        self.transition_label.text = "Level 1 - Boss Battle!"
+        self.transition_label.text = "Level One - Boss Battle!"
 
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
 
     def start_stage(self):
         super().start_stage()
-
-        boss = SeaStar(
-            self.window.width * 2 / 3,
-            self.window.height + SeaStar.RADIUS,
-            self,
-            6,
-            interval=0.5,
-            double=True,
-        )
-        boss.hp = 30
+        self.boss = L1Boss(self)
 
     def stage_update(self, delta_time: float):
-        return super().stage_update(delta_time)
+        super().stage_update(delta_time)
+        if self.boss.hp == 0:
+            self.boss.hp_label.text = "Boss Vanquished!"
+
+    def on_draw(self):
+        super().on_draw()
+        if not self.in_transition:
+            self.boss.draw_hp_bar()
 
 
 class ToEnd(Stage):
@@ -199,4 +249,4 @@ class ToEnd(Stage):
         self.window.show_view(YouWin())
 
     def stage_update(self, delta_time: float):
-        return super().stage_update(delta_time)
+        super.stage_update(delta_time)

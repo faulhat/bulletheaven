@@ -36,7 +36,7 @@ class PauseMenu(Menu):
 
         self.stage.on_key_press(symbol, modifiers)
         return super().on_key_press(symbol, modifiers)
-    
+
     def on_key_release(self, _symbol: int, _modifiers: int):
         self.stage.on_key_release(_symbol, _modifiers)
         return super().on_key_release(_symbol, _modifiers)
