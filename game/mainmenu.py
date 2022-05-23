@@ -3,7 +3,6 @@ import arcade
 
 from menus import MenuItem, MenuItems
 from stages import StageOne
-from player import Player
 
 
 class MainMenu(arcade.View):

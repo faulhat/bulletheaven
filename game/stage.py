@@ -8,7 +8,7 @@ from player import Player
 
 
 class Stage(arcade.View):
-    def __init__(self, stage_number: int, other: "Stage" = None):
+    def __init__(self, other: "Stage" = None):
         super().__init__()
         if not other:
             self.player = Player(
@@ -32,11 +32,10 @@ class Stage(arcade.View):
             self.friendly = other.friendly
             self.keys = other.keys
 
-        self.stage_number = stage_number
         self.stopwatch = 0
         self.stage_stopwatch = 0
         self.transition_label = arcade.Text(
-            f"Stage {self.stage_number}",
+            f"",
             self.window.width / 2,
             self.window.height / 2,
             font_size=20,
