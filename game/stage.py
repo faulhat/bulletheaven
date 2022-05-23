@@ -87,7 +87,7 @@ class Stage(arcade.View):
         self.bullets.on_update(delta_time)
         self.friendly.on_update(delta_time)
 
-        true_player_speed = self.player.speed
+        true_player_speed = Player.SPEED
         if arcade.key.S in self.keys:
             self.slow = True
             true_player_speed /= 2
@@ -159,11 +159,15 @@ class Stage(arcade.View):
             self.stopwatch = 0
 
         for enemy in self.enemies:
-            if enemy.collides_with_list(self.friendly):
+            hits = enemy.collides_with_list(self.friendly)
+            if hits:
                 if enemy.hp - 1 == 0:
                     enemy.remove_from_sprite_lists()
                 else:
                     enemy.hp -= 1
+                
+                for friendly_bullet in hits:
+                    friendly_bullet.remove_from_sprite_lists()
 
     def on_draw(self):
         self.player.draw()

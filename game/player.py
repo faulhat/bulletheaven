@@ -5,6 +5,8 @@ from bullets import Bullet
 
 
 class Player(arcade.SpriteCircle):
+    SPEED = 400
+
     class FriendlyBullet(Bullet):
         def __init__(self, x: float, y: float, stage: arcade.View):
             super().__init__(
@@ -16,11 +18,10 @@ class Player(arcade.SpriteCircle):
         self.stage = stage
         self.set_position(init_x, init_y)
 
-        self.hp = 5
+        self.hp = 10
         self.invincible = False
-        self.speed = 500
         self.hp_label = arcade.Text(
-            "HP: 5",
+            f"HP: {self.hp}",
             stage.window.width - 30,
             stage.window.height - 30,
             anchor_x="right",
