@@ -6,16 +6,22 @@ from constants import *
 
 
 class Player(arcade.SpriteCircle):
+    RADIUS = 12
     SPEED = 400
 
     class FriendlyBullet(Bullet):
         def __init__(self, x: float, y: float, stage: arcade.View):
             super().__init__(
-                8, (65, 105, 255, 240), x, y, math.pi * 1 / 2, 600, stage, friendly=True
+                8, (65, 105, 255, 230), x, y, math.pi * 1 / 2, 600, stage, friendly=True
             )
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
-        super().__init__(12, arcade.csscolor.ALICE_BLUE)
+        super().__init__(Player.RADIUS, arcade.csscolor.WHITE)
+        self.normal_texture = self.texture
+        self.on_hit_texture = arcade.make_circle_texture(
+            Player.RADIUS * 2, arcade.csscolor.ORANGE
+        )
+
         self.stage = stage
         self.set_position(init_x, init_y)
 
@@ -46,7 +52,7 @@ class Player(arcade.SpriteCircle):
     def set_hp(self, hp: int):
         self.hp = hp
         self.hp_label.text = f"HP: {hp}"
-    
+
     def inc_score(self, n: int = 1):
         self.score += n
         self.score_label.text = f"SCORE: {self.score}"
@@ -60,7 +66,7 @@ class Player(arcade.SpriteCircle):
             max(self.width / 2, x),
         )
         y = min(
-            self.stage.window.height - self.width / 2,
+            HEIGHT - self.width / 2,
             max(self.width / 2, y),
         )
         super().set_position(x, y)

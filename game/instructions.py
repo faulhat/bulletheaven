@@ -11,7 +11,7 @@ class Instructions(InfoScreen):
         "Use X to pause",
         "Hold S to slow down",
         "Avoid the bullets (red)",
-        "Try to hit the enemies (pink)",
+        "Try to hit the enemies (blue)",
         "When you kill an enemy you score a point",
         "5 points = 1 HP",
     ]
@@ -37,5 +37,5 @@ class Instructions(InfoScreen):
                 font_name="PressStart2P",
                 anchor_x="center",
             ),
-            L1Stage1()
+            L1Stage1(),
         )

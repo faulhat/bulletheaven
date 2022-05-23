@@ -65,9 +65,9 @@ class MainMenu(Menu):
     def on_draw(self):
         arcade.draw_texture_rectangle(
             WIDTH // 2,
-            self.window.height // 2,
+            HEIGHT // 2,
             WIDTH,
-            self.window.height,
+            HEIGHT,
             self.title_frames[self.frame],
         )
 

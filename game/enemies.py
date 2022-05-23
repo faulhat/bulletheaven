@@ -21,11 +21,39 @@ class Enemy(arcade.SpriteCircle):
         stage: Stage,
         init_hp: int,
     ):
-        super().__init__(radius, arcade.csscolor.VIOLET)
+        super().__init__(radius, arcade.csscolor.SKY_BLUE)
+        self.normal_texture = self.texture
+        self.on_hit_texture = arcade.make_circle_texture(
+            radius * 2, arcade.csscolor.RED
+        )
+
         self.set_position(x, y)
         stage.enemies.append(self)
         self.stage = stage
         self.hp = init_hp
+        self.hit = False
+        self.hit_wait_clock = 0
+        self.hit_counter = 0
+
+    def on_hit(self):
+        self.hit_wait_clock = 0
+        self.hit_counter = 0
+        self.hit = True
+        self.texture = self.on_hit_texture
+
+    def on_update(self, delta_time: float):
+        self.hit_wait_clock += delta_time
+        if self.hit:
+            if self.hit_wait_clock > 0.15:
+                self.hit_wait_clock = 0
+                self.hit_counter += 1
+                if self.hit_counter == 4:
+                    self.hit = False
+                    self.texture = self.normal_texture
+                elif self.hit_counter % 2 == 0:
+                    self.texture = self.on_hit_texture
+                else:
+                    self.texture = self.normal_texture
 
 
 class SeaStar(Enemy):
@@ -56,14 +84,12 @@ class SeaStar(Enemy):
     def rand_next(self):
         self.angle_offset = random() * math.pi * 2
         self.prev_x, self.prev_y = self.next_x, self.next_y
-        self.next_x = (
-            random() * (WIDTH - 2 * self.width / 2) + self.width / 2
-        )
-        self.next_y = (random() * 1 / 2 + 1 / 2) * (
-            self.stage.window.height - 2 * self.width / 2
-        )
+        self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
+        self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
 
     def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+
         self.stopwatch += delta_time
         if not self.shooting:
             if self.stopwatch > self.interval:
@@ -108,9 +134,7 @@ class FallingStar(Enemy):
     angle: float
 
     def __init__(self, x: float, stage: Stage):
-        super().__init__(
-            15, x, stage.window.height + 10, stage, 5
-        )
+        super().__init__(15, x, stage.window.height + 10, stage, 5)
         self.target_x = stage.window.width - x
         self.target_y = -10
         self.stopwatch = 0
@@ -125,6 +149,8 @@ class FallingStar(Enemy):
             )
 
     def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+
         if self.position[1] < self.target_y:
             self.remove_from_sprite_lists()
             return
@@ -168,6 +194,8 @@ class Turret(Enemy):
         self.stopwatch = 0
 
     def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+
         x = self.position[0]
         y = self.position[1]
         if (self.direction > 0 and x > WIDTH + self.width / 2) or (
@@ -185,6 +213,6 @@ class Turret(Enemy):
             BasicBullet(
                 x,
                 y - self.width / 2,
-                math.pi * 3/2,
+                math.pi * 3 / 2,
                 self.stage,
             )

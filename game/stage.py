@@ -14,7 +14,7 @@ class Stage(arcade.View):
         if not other:
             self.player = Player(
                 WIDTH / 2,
-                self.window.height / 3,
+                HEIGHT / 3,
                 self,
             )
             self.enemies = arcade.SpriteList()
@@ -38,7 +38,7 @@ class Stage(arcade.View):
         self.transition_label = arcade.Text(
             f"",
             WIDTH / 2,
-            self.window.height / 2,
+            HEIGHT / 2,
             font_size=20,
             anchor_x="center",
             anchor_y="center",
@@ -131,13 +131,13 @@ class Stage(arcade.View):
             # Make player sprite blink while invincible
             blink_clock = int(self.stopwatch * 5) % 2
             if blink_clock == 0:
-                self.player.color = arcade.csscolor.ORANGE
+                self.player.texture = self.player.on_hit_texture
             if blink_clock == 1:
-                self.player.color = arcade.csscolor.ALICE_BLUE
+                self.player.texture = self.player.normal_texture
 
             if self.stopwatch > 3:
                 self.player.invincible = False
-                self.player.color = arcade.csscolor.ALICE_BLUE
+                self.player.texture = self.player.normal_texture
         else:
             # The player fires a steady stream of bullets when not invincible
             if self.player.firing_stopwatch > 0.1:
@@ -170,6 +170,8 @@ class Stage(arcade.View):
                 if enemy.hp == 0:
                     enemy.remove_from_sprite_lists()
                     self.player.inc_score()
+                else:
+                    enemy.on_hit()
 
                 for friendly_bullet in hits:
                     friendly_bullet.remove_from_sprite_lists()

@@ -31,6 +31,7 @@ class GameOver(InfoScreen):
             mainmenu.MainMenu(),
         )
 
+
 class YouWin(GameOver):
     def __init__(self):
         super().__init__()

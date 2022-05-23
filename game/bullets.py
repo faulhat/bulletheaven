@@ -41,7 +41,7 @@ class Bullet(arcade.SpriteCircle):
         if (
             x > WIDTH + self.width / 2
             or x < -self.width / 2
-            or y > self.stage.window.height + self.width / 2
+            or y > HEIGHT + self.width / 2
             or y < -self.width / 2
         ):
             self.remove_from_sprite_lists()

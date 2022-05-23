@@ -16,10 +16,10 @@ class L1Stage1(Stage):
 
     def start_stage(self):
         super().start_stage()
-        SeaStar(100, self.window.height + 15, self, interval=2)
+        SeaStar(100, HEIGHT + 15, self, interval=2)
         SeaStar(
             WIDTH - 100,
-            self.window.height + 15,
+            HEIGHT + 15,
             self,
             interval=2,
         )
@@ -47,7 +47,7 @@ class L1Stage2(Stage):
 
     def start_stage(self):
         super().start_stage()
-        SeaStar(WIDTH / 2, self.window.height + 15, self, n_spines=8)
+        SeaStar(WIDTH / 2, HEIGHT + 15, self, n_spines=8)
         self.make_dual_wielder()
 
     def stage_update(self, delta_time: float):
@@ -72,18 +72,14 @@ class L1Stage3(Stage):
 
     def make_dual_wielders(self):
         dual_wielder_a = FallingStar(100, self)
-        dual_wielder_b = FallingStar(self.window.height - 100, self)
+        dual_wielder_b = FallingStar(HEIGHT - 100, self)
         self.dual_wielders.append(dual_wielder_a)
         self.dual_wielders.append(dual_wielder_b)
 
     def start_stage(self):
         super().start_stage()
-        sea_star_a = SeaStar(
-            WIDTH / 2 - 20, self.window.height + 15, self, n_bullets=4
-        )
-        sea_star_b = SeaStar(
-            WIDTH / 2 + 20, self.window.height + 15, self, n_bullets=4
-        )
+        sea_star_a = SeaStar(WIDTH / 2 - 20, HEIGHT + 15, self, n_bullets=4)
+        sea_star_b = SeaStar(WIDTH / 2 + 20, HEIGHT + 15, self, n_bullets=4)
         self.sea_stars.append(sea_star_a)
         self.sea_stars.append(sea_star_b)
 
@@ -98,7 +94,7 @@ class L1Stage3(Stage):
                 self.sea_stars.append(
                     SeaStar(
                         WIDTH / 2,
-                        self.window.height + 15,
+                        HEIGHT + 15,
                         self,
                         n_bullets=4,
                     )
@@ -131,11 +127,11 @@ class L1Stage4(Stage):
         turret_a: Turret
         turret_b: Turret
         if self.counter % 2 == 0:
-            turret_a = Turret(self.window.height * 4 / 8, Turret.RIGHT, 400, self)
-            turret_b = Turret(self.window.height * 6 / 8, Turret.LEFT, 400, self)
+            turret_a = Turret(HEIGHT * 4 / 8, Turret.RIGHT, 400, self)
+            turret_b = Turret(HEIGHT * 6 / 8, Turret.LEFT, 400, self)
         else:
-            turret_a = Turret(self.window.height * 5 / 8, Turret.LEFT, 400, self)
-            turret_b = Turret(self.window.height * 7 / 8, Turret.RIGHT, 400, self)
+            turret_a = Turret(HEIGHT * 5 / 8, Turret.LEFT, 400, self)
+            turret_b = Turret(HEIGHT * 7 / 8, Turret.RIGHT, 400, self)
 
         self.turrets.append(turret_a)
         self.turrets.append(turret_b)
@@ -144,7 +140,7 @@ class L1Stage4(Stage):
         super().start_stage()
         miniboss = SeaStar(
             WIDTH / 3,
-            self.window.height + SeaStar.RADIUS,
+            HEIGHT + SeaStar.RADIUS,
             self,
             2,
             interval=1.5,
@@ -185,7 +181,7 @@ class Wormwood(SeaStar):
         self.hp_label = arcade.Text(
             f"Boss HP: {Wormwood.INIT_HP}",
             20,
-            self.stage.window.height - Wormwood.HP_BAR_HEIGHT / 2,
+            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
             arcade.csscolor.RED,
             font_size=18,
             font_name="PressStart2P",
@@ -199,7 +195,7 @@ class Wormwood(SeaStar):
     def draw_hp_bar(self):
         arcade.draw_rectangle_filled(
             self.hp / Wormwood.INIT_HP * WIDTH / 2,
-            self.stage.window.height - Wormwood.HP_BAR_HEIGHT / 2,
+            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
             self.hp / Wormwood.INIT_HP * WIDTH,
             Wormwood.HP_BAR_HEIGHT,
             arcade.csscolor.GREEN,

@@ -46,9 +46,9 @@ class PauseMenu(Menu):
         self.stage.on_draw()
         arcade.draw_rectangle_filled(
             WIDTH / 2,
-            self.window.height / 2,
+            HEIGHT / 2,
             WIDTH,
-            self.window.height,
+            HEIGHT,
             (100, 100, 100, 100),
         )
         super().on_draw()
