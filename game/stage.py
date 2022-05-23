@@ -1,8 +1,8 @@
 from abc import abstractmethod
 import math
-from typing import overload
 import arcade
 
+from pausemenu import PauseMenu
 from gameover import GameOver
 from player import Player
 
@@ -59,6 +59,10 @@ class Stage(arcade.View):
         self.stage_stopwatch += delta_time
 
     def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.X:
+            self.window.show_view(PauseMenu(self))
+            return
+
         self.keys.add(symbol)
         return super().on_key_press(symbol, modifiers)
 
@@ -165,7 +169,7 @@ class Stage(arcade.View):
                     enemy.remove_from_sprite_lists()
                 else:
                     enemy.hp -= 1
-                
+
                 for friendly_bullet in hits:
                     friendly_bullet.remove_from_sprite_lists()
 

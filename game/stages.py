@@ -41,7 +41,7 @@ class L1Stage2(Stage):
             DualWielder(50, self)
         else:
             DualWielder(self.window.width - 50, self)
-        
+
         self.switch = not self.switch
 
     def start_stage(self):
@@ -77,8 +77,12 @@ class L1Stage3(Stage):
 
     def start_stage(self):
         super().start_stage()
-        sea_star_a = SeaStar(self.window.width / 2 - 20, self.window.height + 15, self, n_bullets=4)
-        sea_star_b = SeaStar(self.window.width / 2 + 20, self.window.height + 15, self, n_bullets=4)
+        sea_star_a = SeaStar(
+            self.window.width / 2 - 20, self.window.height + 15, self, n_bullets=4
+        )
+        sea_star_b = SeaStar(
+            self.window.width / 2 + 20, self.window.height + 15, self, n_bullets=4
+        )
         self.sea_stars.append(sea_star_a)
         self.sea_stars.append(sea_star_b)
 
@@ -90,7 +94,9 @@ class L1Stage3(Stage):
             self.stage_stopwatch = 0
             if len(self.sea_stars) == 1 and self.counter < 3:
                 self.counter += 1
-                SeaStar(self.window.width / 2, self.window.height + 15, self, n_bullets=4)
+                SeaStar(
+                    self.window.width / 2, self.window.height + 15, self, n_bullets=4
+                )
 
         self.new_enemy_clock += delta_time
         if len(self.dual_wielders) == 0:
@@ -172,8 +178,7 @@ class L1Boss(Stage):
             self.window.height + SeaStar.RADIUS,
             self,
             6,
-            interval=0.75,
-            n_bullets=4,
+            interval=0.5,
             double=True,
         )
         boss.hp = 30

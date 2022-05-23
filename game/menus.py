@@ -45,3 +45,23 @@ class MenuItems:
 
     def get(self) -> MenuItem:
         return self.items[self.selected]
+
+
+class Menu(arcade.View):
+    options: MenuItems
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.UP:
+            self.options.decrement()
+
+        if symbol == arcade.key.DOWN:
+            self.options.increment()
+
+        if symbol == arcade.key.ENTER:
+            self.options.get().does(self)
+
+        return super().on_key_press(symbol, modifiers)
+
+    def on_draw(self):
+        for option in self.options.items:
+            option.label.draw()

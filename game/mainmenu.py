@@ -1,11 +1,11 @@
 import os
 import arcade
 
-from menus import MenuItem, MenuItems
+from menus import MenuItem, MenuItems, Menu
 from stages import L1Stage1
 
 
-class MainMenu(arcade.View):
+class MainMenu(Menu):
     # Directory containing animation frames
     TITLE_FRAMES_DIR = os.path.join("assets", "title")
 
@@ -55,18 +55,6 @@ class MainMenu(arcade.View):
             "(C) Thomas Faulhaber, 2022", 10, 30, font_size=14, font_name="PressStart2P"
         )
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.UP:
-            self.options.decrement()
-
-        if symbol == arcade.key.DOWN:
-            self.options.increment()
-
-        if symbol == arcade.key.ENTER:
-            self.options.get().does(self)
-
-        return super().on_key_press(symbol, modifiers)
-
     def on_update(self, delta_time: float):
         self.counter += delta_time
         if self.counter >= MainMenu.INTERVAL:
@@ -82,8 +70,7 @@ class MainMenu(arcade.View):
             self.title_frames[self.frame],
         )
 
-        for option in self.options.items:
-            option.label.draw()
+        super().on_draw()
 
         arcade.draw_rectangle_filled(
             500, 350, 510, 10 * (1 + 5**0.5) / 2, arcade.csscolor.WHITE
