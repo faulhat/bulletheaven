@@ -5,6 +5,7 @@ import arcade
 from pausemenu import PauseMenu
 from gameover import GameOver
 from player import Player
+from constants import *
 
 
 class Stage(arcade.View):
@@ -12,7 +13,7 @@ class Stage(arcade.View):
         super().__init__()
         if not other:
             self.player = Player(
-                self.window.width / 2,
+                WIDTH / 2,
                 self.window.height / 3,
                 self,
             )
@@ -36,7 +37,7 @@ class Stage(arcade.View):
         self.stage_stopwatch = 0
         self.transition_label = arcade.Text(
             f"",
-            self.window.width / 2,
+            WIDTH / 2,
             self.window.height / 2,
             font_size=20,
             anchor_x="center",

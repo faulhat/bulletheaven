@@ -2,6 +2,7 @@ import arcade
 
 from menus import MenuItem, MenuItems, Menu
 import mainmenu
+from constants import *
 
 
 class PauseMenu(Menu):
@@ -44,9 +45,9 @@ class PauseMenu(Menu):
     def on_draw(self):
         self.stage.on_draw()
         arcade.draw_rectangle_filled(
-            self.window.width / 2,
+            WIDTH / 2,
             self.window.height / 2,
-            self.window.width,
+            WIDTH,
             self.window.height,
             (100, 100, 100, 100),
         )

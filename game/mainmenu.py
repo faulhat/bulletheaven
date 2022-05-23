@@ -2,7 +2,8 @@ import os
 import arcade
 
 from menus import MenuItem, MenuItems, Menu
-from stages import L1Stage1
+from instructions import Instructions
+from constants import *
 
 
 class MainMenu(Menu):
@@ -33,7 +34,7 @@ class MainMenu(Menu):
                 MenuItem(
                     "Start!",
                     lambda _: self.window.show_view(
-                        L1Stage1(),
+                        Instructions(),
                     ),
                     start_x=350,
                     start_y=280,
@@ -63,9 +64,9 @@ class MainMenu(Menu):
 
     def on_draw(self):
         arcade.draw_texture_rectangle(
-            self.window.width // 2,
+            WIDTH // 2,
             self.window.height // 2,
-            self.window.width,
+            WIDTH,
             self.window.height,
             self.title_frames[self.frame],
         )

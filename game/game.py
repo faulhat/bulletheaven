@@ -1,16 +1,14 @@
 import arcade
 
 import mainmenu
+from constants import *
 
-
-WIN_WIDTH = 1000
-WIN_HEIGHT = 800
 WIN_TITLE = "Bullet Heaven!"
 
 
 class Game(arcade.Window):
     def __init__(self):
-        super().__init__(WIN_WIDTH, WIN_HEIGHT, WIN_TITLE, center_window=True)
+        super().__init__(WIDTH, HEIGHT, WIN_TITLE, center_window=True)
         arcade.set_background_color(arcade.csscolor.BLACK)
 
         self.fps = 0

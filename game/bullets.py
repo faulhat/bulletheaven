@@ -1,6 +1,8 @@
 import math
 import arcade
 
+from constants import *
+
 
 # Forward declaration to prevent circular import
 class Stage(arcade.View):
@@ -37,7 +39,7 @@ class Bullet(arcade.SpriteCircle):
         self.set_position(x, y)
 
         if (
-            x > self.stage.window.width + self.width / 2
+            x > WIDTH + self.width / 2
             or x < -self.width / 2
             or y > self.stage.window.height + self.width / 2
             or y < -self.width / 2

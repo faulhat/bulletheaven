@@ -4,6 +4,7 @@ import arcade
 
 from bullets import Bullet
 from stage import Stage
+from constants import *
 
 
 class BasicBullet(Bullet):
@@ -15,13 +16,12 @@ class Enemy(arcade.SpriteCircle):
     def __init__(
         self,
         radius: int,
-        color: arcade.Color,
         x: float,
         y: float,
         stage: Stage,
         init_hp: int,
     ):
-        super().__init__(radius, color)
+        super().__init__(radius, arcade.csscolor.VIOLET)
         self.set_position(x, y)
         stage.enemies.append(self)
         self.stage = stage
@@ -41,7 +41,7 @@ class SeaStar(Enemy):
         n_bullets: int = 6,
         double: bool = False,
     ):
-        super().__init__(SeaStar.RADIUS, arcade.csscolor.VIOLET, x, y, stage, 10)
+        super().__init__(SeaStar.RADIUS, x, y, stage, 10)
         self.stopwatch = 0
         self.counter = 0
         self.shooting = False
@@ -57,7 +57,7 @@ class SeaStar(Enemy):
         self.angle_offset = random() * math.pi * 2
         self.prev_x, self.prev_y = self.next_x, self.next_y
         self.next_x = (
-            random() * (self.stage.window.width - 2 * self.width / 2) + self.width / 2
+            random() * (WIDTH - 2 * self.width / 2) + self.width / 2
         )
         self.next_y = (random() * 1 / 2 + 1 / 2) * (
             self.stage.window.height - 2 * self.width / 2
@@ -102,19 +102,18 @@ class SeaStar(Enemy):
                         self.angle_offset -= math.pi * 2 / 50
 
 
-class DualWielder(Enemy):
+class FallingStar(Enemy):
     SPEED = 300
 
     angle: float
 
     def __init__(self, x: float, stage: Stage):
         super().__init__(
-            15, arcade.csscolor.INDIGO, x, stage.window.height + 10, stage, 10
+            15, x, stage.window.height + 10, stage, 10
         )
         self.target_x = stage.window.width - x
         self.target_y = -10
         self.stopwatch = 0
-        self.switch = 0
 
         if self.target_x - x == 0:
             # Avoid division by zero.
@@ -131,19 +130,14 @@ class DualWielder(Enemy):
             return
 
         self.stopwatch += delta_time
-        if self.stopwatch > 0.6:
+        if self.stopwatch > 0.5:
             self.stopwatch = 0
-            if self.switch == 0:
-                x = self.position[0] - 18
-                BasicBullet(x, self.position[1], math.pi * 3 / 2, self.stage)
-                self.switch = 1
-            else:
-                x = self.position[0] + 18
-                BasicBullet(x, self.position[1], math.pi * 3 / 2, self.stage)
-                self.switch = 0
+            opp_angle = -self.angle + math.pi
+            x = self.position[0] + math.cos(opp_angle)
+            BasicBullet(x, self.position[1], opp_angle, self.stage)
 
-        x = self.position[0] + math.cos(self.angle) * DualWielder.SPEED * delta_time
-        y = self.position[1] + math.sin(self.angle) * DualWielder.SPEED * delta_time
+        x = self.position[0] + math.cos(self.angle) * FallingStar.SPEED * delta_time
+        y = self.position[1] + math.sin(self.angle) * FallingStar.SPEED * delta_time
         self.set_position(x, y)
 
 
@@ -161,10 +155,10 @@ class Turret(Enemy):
         arms: int,
         stage: Stage,
     ):
-        super().__init__(12, arcade.csscolor.AZURE, 0, y, stage, 10)
+        super().__init__(12, 0, y, stage, 10)
         x: float
         if direction == Turret.LEFT:
-            x = self.stage.window.width + Turret.RADIUS
+            x = WIDTH + Turret.RADIUS
         elif direction == Turret.RIGHT:
             x = -Turret.RADIUS
 
@@ -181,7 +175,7 @@ class Turret(Enemy):
     def on_update(self, delta_time: float):
         x = self.position[0]
         y = self.position[1]
-        if (self.direction > 0 and x > self.stage.window.width + self.width / 2) or (
+        if (self.direction > 0 and x > WIDTH + self.width / 2) or (
             self.direction < 0 and x < -self.width / 2
         ):
             self.remove_from_sprite_lists()

@@ -2,6 +2,7 @@ import math
 import arcade
 
 from bullets import Bullet
+from constants import *
 
 
 class Player(arcade.SpriteCircle):
@@ -39,7 +40,7 @@ class Player(arcade.SpriteCircle):
 
     def set_position(self, x: float, y: float):
         x = min(
-            self.stage.window.width - self.width / 2,
+            WIDTH - self.width / 2,
             max(self.width / 2, x),
         )
         y = min(

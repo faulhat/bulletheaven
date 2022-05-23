@@ -1,8 +1,9 @@
 import arcade
 
-from enemies import SeaStar, DualWielder, Turret
-from stage import Stage, Player
-from youwin import YouWin
+from enemies import SeaStar, FallingStar, Turret
+from stage import Stage
+from gameover import YouWin
+from constants import *
 
 
 class L1Stage1(Stage):
@@ -17,7 +18,7 @@ class L1Stage1(Stage):
         super().start_stage()
         SeaStar(100, self.window.height + 15, self, interval=2)
         SeaStar(
-            self.window.width - 100,
+            WIDTH - 100,
             self.window.height + 15,
             self,
             interval=2,
@@ -38,15 +39,15 @@ class L1Stage2(Stage):
 
     def make_dual_wielder(self):
         if self.switch:
-            DualWielder(50, self)
+            FallingStar(50, self)
         else:
-            DualWielder(self.window.width - 50, self)
+            FallingStar(WIDTH - 50, self)
 
         self.switch = not self.switch
 
     def start_stage(self):
         super().start_stage()
-        SeaStar(self.window.width / 2, self.window.height + 15, self, n_spines=8)
+        SeaStar(WIDTH / 2, self.window.height + 15, self, n_spines=8)
         self.make_dual_wielder()
 
     def stage_update(self, delta_time: float):
@@ -70,18 +71,18 @@ class L1Stage3(Stage):
         self.window.show_view(L1Stage4(self))
 
     def make_dual_wielders(self):
-        dual_wielder_a = DualWielder(100, self)
-        dual_wielder_b = DualWielder(self.window.height - 100, self)
+        dual_wielder_a = FallingStar(100, self)
+        dual_wielder_b = FallingStar(self.window.height - 100, self)
         self.dual_wielders.append(dual_wielder_a)
         self.dual_wielders.append(dual_wielder_b)
 
     def start_stage(self):
         super().start_stage()
         sea_star_a = SeaStar(
-            self.window.width / 2 - 20, self.window.height + 15, self, n_bullets=4
+            WIDTH / 2 - 20, self.window.height + 15, self, n_bullets=4
         )
         sea_star_b = SeaStar(
-            self.window.width / 2 + 20, self.window.height + 15, self, n_bullets=4
+            WIDTH / 2 + 20, self.window.height + 15, self, n_bullets=4
         )
         self.sea_stars.append(sea_star_a)
         self.sea_stars.append(sea_star_b)
@@ -96,7 +97,7 @@ class L1Stage3(Stage):
                 self.counter += 1
                 self.sea_stars.append(
                     SeaStar(
-                        self.window.width / 2,
+                        WIDTH / 2,
                         self.window.height + 15,
                         self,
                         n_bullets=4,
@@ -146,7 +147,7 @@ class L1Stage4(Stage):
     def start_stage(self):
         super().start_stage()
         miniboss = SeaStar(
-            self.window.width / 3,
+            WIDTH / 3,
             self.window.height + SeaStar.RADIUS,
             self,
             2,
@@ -202,9 +203,9 @@ class L1Boss(SeaStar):
 
     def draw_hp_bar(self):
         arcade.draw_rectangle_filled(
-            self.hp / L1Boss.INIT_HP * self.stage.window.width / 2,
+            self.hp / L1Boss.INIT_HP * WIDTH / 2,
             self.stage.window.height - L1Boss.HP_BAR_HEIGHT / 2,
-            self.hp / L1Boss.INIT_HP * self.stage.window.width,
+            self.hp / L1Boss.INIT_HP * WIDTH,
             L1Boss.HP_BAR_HEIGHT,
             arcade.csscolor.GREEN,
         )
