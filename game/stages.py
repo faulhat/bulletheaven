@@ -131,15 +131,11 @@ class L1Stage4(Stage):
         turret_a: Turret
         turret_b: Turret
         if self.counter % 2 == 0:
-            turret_a = Turret(
-                self.window.height * 4 / 8, Turret.RIGHT, 600, 20, 2, self
-            )
-            turret_b = Turret(self.window.height * 6 / 8, Turret.LEFT, 600, 20, 2, self)
+            turret_a = Turret(self.window.height * 4 / 8, Turret.RIGHT, 400, self)
+            turret_b = Turret(self.window.height * 6 / 8, Turret.LEFT, 400, self)
         else:
-            turret_a = Turret(self.window.height * 5 / 8, Turret.LEFT, 600, 20, 2, self)
-            turret_b = Turret(
-                self.window.height * 7 / 8, Turret.RIGHT, 600, 20, 2, self
-            )
+            turret_a = Turret(self.window.height * 5 / 8, Turret.LEFT, 400, self)
+            turret_b = Turret(self.window.height * 7 / 8, Turret.RIGHT, 400, self)
 
         self.turrets.append(turret_a)
         self.turrets.append(turret_b)

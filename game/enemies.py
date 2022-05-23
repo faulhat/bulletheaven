@@ -41,7 +41,7 @@ class SeaStar(Enemy):
         n_bullets: int = 6,
         double: bool = False,
     ):
-        super().__init__(SeaStar.RADIUS, x, y, stage, 10)
+        super().__init__(SeaStar.RADIUS, x, y, stage, 8)
         self.stopwatch = 0
         self.counter = 0
         self.shooting = False
@@ -109,7 +109,7 @@ class FallingStar(Enemy):
 
     def __init__(self, x: float, stage: Stage):
         super().__init__(
-            15, x, stage.window.height + 10, stage, 10
+            15, x, stage.window.height + 10, stage, 5
         )
         self.target_x = stage.window.width - x
         self.target_y = -10
@@ -151,11 +151,9 @@ class Turret(Enemy):
         y: float,
         direction: int,
         speed: float,
-        rotation_speed: float,
-        arms: int,
         stage: Stage,
     ):
-        super().__init__(12, 0, y, stage, 10)
+        super().__init__(12, 0, y, stage, 5)
         x: float
         if direction == Turret.LEFT:
             x = WIDTH + Turret.RADIUS
@@ -164,12 +162,9 @@ class Turret(Enemy):
 
         self.set_position(x, y)
         self.speed = speed
-        self.rotation_speed = rotation_speed
 
         # Direction should be -1 for left and 1 for right
         self.direction = direction
-        self.arms = arms
-        self.angle = 0
         self.stopwatch = 0
 
     def on_update(self, delta_time: float):
@@ -183,16 +178,13 @@ class Turret(Enemy):
         else:
             x += self.speed * delta_time * self.direction
             self.set_position(x, y)
-            self.angle += delta_time * self.rotation_speed
 
         self.stopwatch += delta_time
-        if self.stopwatch > 0.25:
+        if self.stopwatch > 0.3:
             self.stopwatch = 0
-            for i in range(self.arms):
-                angle = self.angle + i * 2 * math.pi / self.arms
-                BasicBullet(
-                    x + math.cos(angle) * self.width / 2,
-                    y + math.sin(angle) * self.width / 2,
-                    angle,
-                    self.stage,
-                )
+            BasicBullet(
+                x,
+                y - self.width / 2,
+                math.pi * 3/2,
+                self.stage,
+            )
