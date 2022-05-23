@@ -20,12 +20,21 @@ class Player(arcade.SpriteCircle):
         self.set_position(init_x, init_y)
 
         self.hp = 10
+        self.score = 0
         self.invincible = False
         self.hp_label = arcade.Text(
             f"HP: {self.hp}",
             stage.window.width - 30,
             stage.window.height - 70,
             anchor_x="right",
+            font_name="PressStart2P",
+            font_size=18,
+        )
+
+        self.score_label = arcade.Text(
+            f"SCORE: {self.score}",
+            30,
+            stage.window.height - 70,
             font_name="PressStart2P",
             font_size=18,
         )
@@ -37,6 +46,13 @@ class Player(arcade.SpriteCircle):
     def set_hp(self, hp: int):
         self.hp = hp
         self.hp_label.text = f"HP: {hp}"
+    
+    def inc_score(self, n: int = 1):
+        self.score += n
+        self.score_label.text = f"SCORE: {self.score}"
+
+        if self.score % 5 == 0:
+            self.set_hp(self.hp + 1)
 
     def set_position(self, x: float, y: float):
         x = min(

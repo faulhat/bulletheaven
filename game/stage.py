@@ -169,6 +169,7 @@ class Stage(arcade.View):
                 enemy.hp -= 1
                 if enemy.hp == 0:
                     enemy.remove_from_sprite_lists()
+                    self.player.inc_score()
 
                 for friendly_bullet in hits:
                     friendly_bullet.remove_from_sprite_lists()
@@ -179,6 +180,7 @@ class Stage(arcade.View):
         self.bullets.draw()
         self.friendly.draw()
         self.player.hp_label.draw()
+        self.player.score_label.draw()
 
         if self.in_transition:
             self.transition_label.draw()

@@ -172,8 +172,8 @@ class L1Stage4(Stage):
                 self.make_turrets()
 
 
-class L1Boss(SeaStar):
-    INIT_HP = 30
+class Wormwood(SeaStar):
+    INIT_HP = 40
     HP_BAR_HEIGHT = 30
 
     def __init__(self, stage: Stage):
@@ -181,16 +181,15 @@ class L1Boss(SeaStar):
             stage.window.width * 2 / 3,
             stage.window.height + SeaStar.RADIUS,
             stage,
-            n_bullets=5,
             interval=0.7,
             double=True,
         )
 
-        self.hp = L1Boss.INIT_HP
+        self.hp = Wormwood.INIT_HP
         self.hp_label = arcade.Text(
-            f"Boss HP: {L1Boss.INIT_HP}",
+            f"Boss HP: {Wormwood.INIT_HP}",
             20,
-            self.stage.window.height - L1Boss.HP_BAR_HEIGHT / 2,
+            self.stage.window.height - Wormwood.HP_BAR_HEIGHT / 2,
             arcade.csscolor.RED,
             font_size=18,
             font_name="PressStart2P",
@@ -203,10 +202,10 @@ class L1Boss(SeaStar):
 
     def draw_hp_bar(self):
         arcade.draw_rectangle_filled(
-            self.hp / L1Boss.INIT_HP * WIDTH / 2,
-            self.stage.window.height - L1Boss.HP_BAR_HEIGHT / 2,
-            self.hp / L1Boss.INIT_HP * WIDTH,
-            L1Boss.HP_BAR_HEIGHT,
+            self.hp / Wormwood.INIT_HP * WIDTH / 2,
+            self.stage.window.height - Wormwood.HP_BAR_HEIGHT / 2,
+            self.hp / Wormwood.INIT_HP * WIDTH,
+            Wormwood.HP_BAR_HEIGHT,
             arcade.csscolor.GREEN,
         )
 
@@ -214,7 +213,7 @@ class L1Boss(SeaStar):
 
 
 class L1BossStage(Stage):
-    boss: L1Boss
+    boss: Wormwood
 
     def __init__(self, previous):
         super().__init__(previous)
@@ -225,7 +224,7 @@ class L1BossStage(Stage):
 
     def start_stage(self):
         super().start_stage()
-        self.boss = L1Boss(self)
+        self.boss = Wormwood(self)
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)

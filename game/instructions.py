@@ -10,8 +10,10 @@ class Instructions(InfoScreen):
         "Use the arrow keys to move",
         "Use X to pause",
         "Hold S to slow down",
-        "Try to hit the enemies (pink)",
         "Avoid the bullets (red)",
+        "Try to hit the enemies (pink)",
+        "When you kill an enemy you score a point",
+        "5 points = 1 HP",
     ]
 
     def __init__(self):
