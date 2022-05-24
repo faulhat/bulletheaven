@@ -10,7 +10,7 @@ class Instructions(InfoScreen):
         "Use the arrow keys to move",
         "Use X to pause",
         "Hold S to slow down",
-        "Avoid the bullets (red)",
+        "Avoid the bullets (pink)",
         "Try to hit the enemies (light green)",
         "When you kill an enemy you score a point",
         "5 points = 1 HP",

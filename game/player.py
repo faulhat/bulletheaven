@@ -6,7 +6,7 @@ from constants import *
 
 
 class Player(arcade.SpriteCircle):
-    RADIUS = 12
+    RADIUS = 15
     SPEED = 400
 
     class FriendlyBullet(Bullet):
@@ -19,7 +19,7 @@ class Player(arcade.SpriteCircle):
         super().__init__(Player.RADIUS, arcade.csscolor.WHITE)
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
-            Player.RADIUS * 2, arcade.csscolor.ORANGE
+            Player.RADIUS * 2, arcade.csscolor.RED
         )
 
         self.stage = stage

@@ -9,7 +9,7 @@ from constants import *
 
 class BasicBullet(Bullet):
     def __init__(self, x: float, y: float, angle: float, stage: Stage):
-        super().__init__(8, arcade.csscolor.RED, x, y, angle, 400, stage)
+        super().__init__(8, arcade.csscolor.VIOLET, x, y, angle, 400, stage)
 
 
 class Enemy(arcade.SpriteCircle):
@@ -37,23 +37,15 @@ class Enemy(arcade.SpriteCircle):
 
     def on_hit(self):
         self.hit_wait_clock = 0
-        self.hit_counter = 0
         self.hit = True
         self.texture = self.on_hit_texture
 
     def on_update(self, delta_time: float):
         self.hit_wait_clock += delta_time
         if self.hit:
-            if self.hit_wait_clock > 0.15:
-                self.hit_wait_clock = 0
-                self.hit_counter += 1
-                if self.hit_counter == 4:
-                    self.hit = False
-                    self.texture = self.normal_texture
-                elif self.hit_counter % 2 == 0:
-                    self.texture = self.on_hit_texture
-                else:
-                    self.texture = self.normal_texture
+            if self.hit_wait_clock > 0.1:
+                self.hit = False
+                self.texture = self.normal_texture
 
 
 class SeaStar(Enemy):
