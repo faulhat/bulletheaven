@@ -8,7 +8,8 @@ from constants import *
 class Player(arcade.SpriteCircle):
     RADIUS = 15
     SPEED = 400
-
+    INIT_HP = 8
+    
     class FriendlyBullet(Bullet):
         def __init__(self, x: float, y: float, stage: arcade.View):
             super().__init__(
@@ -25,7 +26,7 @@ class Player(arcade.SpriteCircle):
         self.stage = stage
         self.set_position(init_x, init_y)
 
-        self.hp = 8
+        self.hp = Player.INIT_HP
         self.score = 0
         self.invincible = False
         self.hp_label = arcade.Text(
@@ -49,6 +50,8 @@ class Player(arcade.SpriteCircle):
         self.slow = False
         self.firing_stopwatch = 0
         self.blink = False
+
+        self.n_continues = 2
 
     def set_hp(self, hp: int):
         self.hp = hp

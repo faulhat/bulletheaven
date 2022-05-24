@@ -1,28 +1,33 @@
 import arcade
 
+from player import Player
 from menus import MenuItem, MenuItems, Menu
 import mainmenu
 from constants import *
 
 
-class PauseMenu(Menu):
-    def __init__(self, stage: arcade.View):
+class Stage(arcade.View):
+    player: Player
+
+
+class ContinueMenu(Menu):
+    def __init__(self, stage: Stage):
         super().__init__()
         self.stage = stage
         self.options = MenuItems(
             [
                 MenuItem(
-                    "Return",
-                    lambda menu: menu.window.show_view(self.stage),
-                    start_x=350,
+                    "Continue",
+                    lambda menu: menu.use_continue(),
+                    start_x=150,
                     start_y=500,
                     font_size=18,
                     font_name="PressStart2P",
                 ),
                 MenuItem(
-                    "Quit to title",
+                    "Give up",
                     lambda menu: menu.window.show_view(mainmenu.MainMenu()),
-                    start_x=350,
+                    start_x=150,
                     start_y=460,
                     font_size=18,
                     font_name="PressStart2P",
@@ -30,11 +35,27 @@ class PauseMenu(Menu):
             ]
         )
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.X:
-            self.window.show_view(self.stage)
-            return
+        continue_text: str
+        if stage.player.n_continues == 1:
+            continue_text = f"You have 1 continue remaining."
+        else:
+            continue_text = f"You have {stage.player.n_continues} continues remaining."
 
+        self.continue_label = arcade.Text(
+            continue_text,
+            start_x=150,
+            start_y=540,
+            font_size=18,
+            font_name="PressStart2P",
+        )
+
+    def use_continue(self):
+        self.stage.player.invincible = True
+        self.stage.player.set_hp(Player.INIT_HP)
+        self.stage.player.n_continues -= 1
+        self.window.show_view(self.stage)
+
+    def on_key_press(self, symbol: int, modifiers: int):
         self.stage.on_key_press(symbol, modifiers)
         return super().on_key_press(symbol, modifiers)
 
@@ -49,6 +70,7 @@ class PauseMenu(Menu):
             HEIGHT / 2,
             WIDTH,
             HEIGHT,
-            (50, 50, 200, 100),
+            (200, 50, 50, 100),
         )
+        self.continue_label.draw()
         super().on_draw()

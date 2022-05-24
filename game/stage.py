@@ -2,8 +2,9 @@ from abc import abstractmethod
 import math
 import arcade
 
-from pausemenu import PauseMenu
+from contmenu import ContinueMenu
 from gameover import GameOver
+from pausemenu import PauseMenu
 from player import Player
 from constants import *
 
@@ -76,8 +77,12 @@ class Stage(arcade.View):
         self.player.firing_stopwatch += delta_time
 
         if self.player.dead:
-            if self.stopwatch > 1:
-                self.window.show_view(GameOver())
+            if self.stopwatch > 0.5:
+                if self.player.n_continues == 0:
+                    self.window.show_view(GameOver())
+                else:
+                    self.player.dead = False
+                    self.window.show_view(ContinueMenu(self))
 
             return
         elif self.in_transition:
@@ -159,16 +164,16 @@ class Stage(arcade.View):
         if not self.player.invincible and (
             enemy_hits or self.player.collides_with_list(self.enemies)
         ):
-            if self.player.hp - 1 == 0:
+            self.player.set_hp(self.player.hp - 1)
+            if self.player.hp == 0:
                 # The player is dead
                 self.player.dead = True
-                self.player.color = arcade.csscolor.PALE_VIOLET_RED
+                self.player.texture = self.player.on_hit_texture
                 self.stopwatch = 0
 
             for bullet in enemy_hits:
                 bullet.remove_from_sprite_lists()
 
-            self.player.set_hp(self.player.hp - 1)
             self.player.invincible = True
             self.stopwatch = 0
 
