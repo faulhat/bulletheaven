@@ -131,26 +131,33 @@ class Stage(arcade.View):
             # Make player sprite blink while invincible
             blink_clock = int(self.stopwatch * 5) % 2
             if blink_clock == 0:
+                self.player.blink = True
                 self.player.texture = self.player.on_hit_texture
-            if blink_clock == 1:
-                self.player.texture = self.player.normal_texture
+                self.player.hp_label.color = arcade.csscolor.BLACK
 
-            if self.stopwatch > 3:
+            if blink_clock == 1:
+                self.player.blink = False
+                self.player.texture = self.player.normal_texture
+                self.player.hp_label.color = arcade.csscolor.WHITE
+
+            if self.stopwatch > 2:
+                self.player.blink = False
                 self.player.invincible = False
                 self.player.texture = self.player.normal_texture
-        else:
-            # The player fires a steady stream of bullets when not invincible
-            if self.player.firing_stopwatch > 0.1:
-                Player.FriendlyBullet(
-                    self.player.position[0],
-                    self.player.position[1] + 20,
-                    self,
-                )
-                self.player.firing_stopwatch = 0
+                self.player.hp_label.color = arcade.csscolor.WHITE
 
+        # The player fires a steady stream of bullets
+        if self.player.firing_stopwatch > 0.1:
+            Player.FriendlyBullet(
+                self.player.position[0],
+                self.player.position[1] + 20,
+                self,
+            )
+            self.player.firing_stopwatch = 0
+
+        enemy_hits = self.player.collides_with_list(self.bullets)
         if not self.player.invincible and (
-            self.player.collides_with_list(self.bullets)
-            or self.player.collides_with_list(self.enemies)
+            enemy_hits or self.player.collides_with_list(self.enemies)
         ):
             if self.player.hp - 1 == 0:
                 # The player is dead
@@ -158,7 +165,9 @@ class Stage(arcade.View):
                 self.player.color = arcade.csscolor.PALE_VIOLET_RED
                 self.stopwatch = 0
 
-            self.bullets.clear()
+            for bullet in enemy_hits:
+                bullet.remove_from_sprite_lists()
+
             self.player.set_hp(self.player.hp - 1)
             self.player.invincible = True
             self.stopwatch = 0
@@ -181,6 +190,18 @@ class Stage(arcade.View):
         self.enemies.draw()
         self.bullets.draw()
         self.friendly.draw()
+
+        if self.player.blink:
+            arcade.draw_rectangle_filled(
+                self.player.hp_label.position[0]
+                - self.player.hp_label.content_width / 2,
+                self.player.hp_label.position[1]
+                + self.player.hp_label.content_height / 2,
+                self.player.hp_label.content_width + 20,
+                self.player.hp_label.content_height + 20,
+                arcade.csscolor.RED,
+            )
+
         self.player.hp_label.draw()
         self.player.score_label.draw()
 

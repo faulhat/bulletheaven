@@ -1,6 +1,6 @@
 import arcade
 
-from enemies import SeaStar, FallingStar, Turret
+from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from stage import Stage
 from gameover import YouWin
 from constants import *
@@ -162,46 +162,6 @@ class L1Stage4(Stage):
             elif self.stage_stopwatch > 3:
                 self.turrets_wait = False
                 self.make_turrets()
-
-
-class Wormwood(SeaStar):
-    INIT_HP = 40
-    HP_BAR_HEIGHT = 30
-
-    def __init__(self, stage: Stage):
-        super().__init__(
-            stage.window.width * 2 / 3,
-            stage.window.height + SeaStar.RADIUS,
-            stage,
-            interval=0.7,
-            double=True,
-        )
-
-        self.hp = Wormwood.INIT_HP
-        self.hp_label = arcade.Text(
-            f"Boss HP: {Wormwood.INIT_HP}",
-            20,
-            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
-            arcade.csscolor.RED,
-            font_size=18,
-            font_name="PressStart2P",
-            anchor_y="center",
-        )
-
-    def on_update(self, delta_time: float):
-        super().on_update(delta_time)
-        self.hp_label.text = f"Boss HP: {self.hp}"
-
-    def draw_hp_bar(self):
-        arcade.draw_rectangle_filled(
-            self.hp / Wormwood.INIT_HP * WIDTH / 2,
-            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
-            self.hp / Wormwood.INIT_HP * WIDTH,
-            Wormwood.HP_BAR_HEIGHT,
-            arcade.csscolor.GREEN,
-        )
-
-        self.hp_label.draw()
 
 
 class L1BossStage(Stage):

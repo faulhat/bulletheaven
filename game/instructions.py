@@ -11,7 +11,7 @@ class Instructions(InfoScreen):
         "Use X to pause",
         "Hold S to slow down",
         "Avoid the bullets (red)",
-        "Try to hit the enemies (blue)",
+        "Try to hit the enemies (light green)",
         "When you kill an enemy you score a point",
         "5 points = 1 HP",
     ]

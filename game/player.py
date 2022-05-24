@@ -25,7 +25,7 @@ class Player(arcade.SpriteCircle):
         self.stage = stage
         self.set_position(init_x, init_y)
 
-        self.hp = 10
+        self.hp = 8
         self.score = 0
         self.invincible = False
         self.hp_label = arcade.Text(
@@ -48,6 +48,7 @@ class Player(arcade.SpriteCircle):
         self.dead = False
         self.slow = False
         self.firing_stopwatch = 0
+        self.blink = False
 
     def set_hp(self, hp: int):
         self.hp = hp

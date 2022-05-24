@@ -21,7 +21,7 @@ class Enemy(arcade.SpriteCircle):
         stage: Stage,
         init_hp: int,
     ):
-        super().__init__(radius, arcade.csscolor.SKY_BLUE)
+        super().__init__(radius, arcade.csscolor.LIGHT_GREEN)
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
             radius * 2, arcade.csscolor.RED
@@ -69,7 +69,7 @@ class SeaStar(Enemy):
         n_bullets: int = 6,
         double: bool = False,
     ):
-        super().__init__(SeaStar.RADIUS, x, y, stage, 8)
+        super().__init__(SeaStar.RADIUS, x, y, stage, 12)
         self.stopwatch = 0
         self.counter = 0
         self.shooting = False
@@ -216,3 +216,44 @@ class Turret(Enemy):
                 math.pi * 3 / 2,
                 self.stage,
             )
+
+
+class Wormwood(SeaStar):
+    INIT_HP = 40
+    HP_BAR_HEIGHT = 30
+
+    def __init__(self, stage: Stage):
+        super().__init__(
+            stage.window.width * 2 / 3,
+            stage.window.height + SeaStar.RADIUS,
+            stage,
+            n_spines=7,
+            interval=0.75,
+            double=True,
+        )
+
+        self.hp = Wormwood.INIT_HP
+        self.hp_label = arcade.Text(
+            f"Boss HP: {Wormwood.INIT_HP}",
+            20,
+            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
+            arcade.csscolor.RED,
+            font_size=18,
+            font_name="PressStart2P",
+            anchor_y="center",
+        )
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+        self.hp_label.text = f"Boss HP: {self.hp}"
+
+    def draw_hp_bar(self):
+        arcade.draw_rectangle_filled(
+            self.hp / Wormwood.INIT_HP * WIDTH / 2,
+            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
+            self.hp / Wormwood.INIT_HP * WIDTH,
+            Wormwood.HP_BAR_HEIGHT,
+            arcade.csscolor.GREEN,
+        )
+
+        self.hp_label.draw()
