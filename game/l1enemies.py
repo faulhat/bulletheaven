@@ -48,7 +48,32 @@ class Enemy(arcade.SpriteCircle):
                 self.texture = self.normal_texture
 
 
-class SeaStar(Enemy):
+class DartingEnemy(Enemy):
+    def rand_next(self):
+        self.angle_offset = random() * math.pi * 2
+        self.prev_x, self.prev_y = self.next_x, self.next_y
+        self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
+        self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
+    
+    def __init__(self, radius: float, x: float, y: float, stage: Stage, init_hp: int):
+        super().__init__(radius, x, y, stage, init_hp)
+        self.next_x, self.next_y = self.position
+        self.rand_next()
+        self.stopwatch = 0
+    
+    def dart_update(self):
+        x = (
+            self.prev_x
+            + (self.next_x - self.prev_x) * self.stopwatch / self.interval
+        )
+        y = (
+            self.prev_y
+            + (self.next_y - self.prev_y) * self.stopwatch / self.interval
+        )
+        self.set_position(x, y)
+
+
+class SeaStar(DartingEnemy):
     RADIUS = 15
 
     def __init__(
@@ -62,22 +87,13 @@ class SeaStar(Enemy):
         double: bool = False,
     ):
         super().__init__(SeaStar.RADIUS, x, y, stage, 12)
-        self.stopwatch = 0
         self.counter = 0
         self.shooting = False
         self.angle_offset = 0
-        self.next_x, self.next_y = self.position
-        self.rand_next()
         self.n_spines = n_spines
         self.interval = interval
         self.n_bullets = n_bullets
         self.double = double
-
-    def rand_next(self):
-        self.angle_offset = random() * math.pi * 2
-        self.prev_x, self.prev_y = self.next_x, self.next_y
-        self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
-        self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -89,15 +105,7 @@ class SeaStar(Enemy):
                 self.counter = 0
                 self.shooting = True
             else:
-                x = (
-                    self.prev_x
-                    + (self.next_x - self.prev_x) * self.stopwatch / self.interval
-                )
-                y = (
-                    self.prev_y
-                    + (self.next_y - self.prev_y) * self.stopwatch / self.interval
-                )
-                self.set_position(x, y)
+                self.dart_update()
         else:
             if self.stopwatch > self.interval / self.n_bullets:
                 self.stopwatch = 0
