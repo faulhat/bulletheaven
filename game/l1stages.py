@@ -7,8 +7,8 @@ from constants import *
 
 
 class L1Stage1(Stage):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
         self.transition_label.text = "Level One - Stage One"
 
     def inc_stage(self):
@@ -29,7 +29,7 @@ class L1Stage1(Stage):
 
 
 class L1Stage2(Stage):
-    def __init__(self, previous: Stage):
+    def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level One - Stage Two"
         self.switch = False
@@ -58,7 +58,7 @@ class L1Stage2(Stage):
 
 
 class L1Stage3(Stage):
-    def __init__(self, previous: Stage):
+    def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level One - Stage Three"
         self.sea_stars = arcade.SpriteList()
@@ -111,7 +111,7 @@ class L1Stage3(Stage):
 
 
 class L1Stage4(Stage):
-    def __init__(self, previous: Stage):
+    def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level One - Stage Four"
 
@@ -167,7 +167,7 @@ class L1Stage4(Stage):
 class L1BossStage(Stage):
     boss: Wormwood
 
-    def __init__(self, previous):
+    def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level One - Boss Battle!"
 
@@ -190,7 +190,7 @@ class L1BossStage(Stage):
 
 
 class ToEnd(Stage):
-    def __init__(self, previous: Stage):
+    def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "The End."
 

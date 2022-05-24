@@ -54,23 +54,30 @@ class DartingEnemy(Enemy):
         self.prev_x, self.prev_y = self.next_x, self.next_y
         self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
         self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
-    
-    def __init__(self, radius: float, x: float, y: float, stage: Stage, init_hp: int):
+
+    def __init__(
+        self,
+        radius: float,
+        x: float,
+        y: float,
+        stage: Stage,
+        init_hp: int,
+        interval: float = 1,
+    ):
         super().__init__(radius, x, y, stage, init_hp)
         self.next_x, self.next_y = self.position
         self.rand_next()
         self.stopwatch = 0
-    
+        self.interval = interval
+
     def dart_update(self):
-        x = (
-            self.prev_x
-            + (self.next_x - self.prev_x) * self.stopwatch / self.interval
-        )
-        y = (
-            self.prev_y
-            + (self.next_y - self.prev_y) * self.stopwatch / self.interval
-        )
+        x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch / self.interval
+        y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch / self.interval
         self.set_position(x, y)
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+        self.stopwatch += delta_time
 
 
 class SeaStar(DartingEnemy):
@@ -86,7 +93,7 @@ class SeaStar(DartingEnemy):
         n_bullets: int = 6,
         double: bool = False,
     ):
-        super().__init__(SeaStar.RADIUS, x, y, stage, 12)
+        super().__init__(SeaStar.RADIUS, x, y, stage, 12, interval=interval)
         self.counter = 0
         self.shooting = False
         self.angle_offset = 0
@@ -98,7 +105,6 @@ class SeaStar(DartingEnemy):
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
 
-        self.stopwatch += delta_time
         if not self.shooting:
             if self.stopwatch > self.interval:
                 self.stopwatch = 0
@@ -143,10 +149,7 @@ class FallingStar(Enemy):
             # Avoid division by zero.
             self.angle = math.pi * 3 / 2
         else:
-            self.angle = (
-                -math.atan((self.target_x - x) / -(stage.window.height + 20))
-                - math.pi / 2
-            )
+            self.angle = math.atan2(-(stage.window.height + 20), self.target_x - x)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
