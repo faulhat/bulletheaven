@@ -27,6 +27,7 @@ class Bullet(arcade.SpriteCircle):
         self.angle = angle
         self.speed = speed
         self.stage = stage
+        self.color = color
 
         if friendly:
             stage.friendly.append(self)
@@ -49,3 +50,6 @@ class Bullet(arcade.SpriteCircle):
 
         if self.out_of_bounds():
             self.remove_from_sprite_lists()
+
+    def draw(self):
+        arcade.draw_circle_outline(self.position[0], self.position[1], self.width/2, self.color, border_width=2)

@@ -5,16 +5,17 @@ from bullets import Bullet
 from constants import *
 
 
+class FriendlyBullet(Bullet):
+    def __init__(self, x: float, y: float, stage: arcade.View):
+        super().__init__(
+            8, arcade.csscolor.BLUE, x, y, math.pi * 1 / 2, 600, stage, friendly=True
+        )
+        
+
 class Player(arcade.SpriteCircle):
     RADIUS = 15
     SPEED = 400
     INIT_HP = 8
-
-    class FriendlyBullet(Bullet):
-        def __init__(self, x: float, y: float, stage: arcade.View):
-            super().__init__(
-                8, (65, 105, 255, 230), x, y, math.pi * 1 / 2, 600, stage, friendly=True
-            )
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
         super().__init__(Player.RADIUS, arcade.csscolor.WHITE)

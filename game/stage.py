@@ -5,7 +5,7 @@ import arcade
 from contmenu import ContinueMenu
 from gameover import GameOver
 from pausemenu import PauseMenu
-from player import Player
+from player import Player, FriendlyBullet
 from constants import *
 
 
@@ -153,7 +153,7 @@ class Stage(arcade.View):
 
         # The player fires a steady stream of bullets
         if self.player.firing_stopwatch > 0.1:
-            Player.FriendlyBullet(
+            FriendlyBullet(
                 self.player.position[0],
                 self.player.position[1] + 20,
                 self,
@@ -192,8 +192,14 @@ class Stage(arcade.View):
     def on_draw(self):
         self.player.draw()
         self.enemies.draw()
-        self.bullets.draw()
-        self.friendly.draw()
+
+        # Bullet overrides Sprite.draw()
+        # but SpriteList.draw() doesn't actually call Sprite.draw()
+        for friendly_bullet in self.friendly:
+            friendly_bullet.draw()
+        
+        for bullet in self.bullets:
+            bullet.draw()
 
         if self.player.blink:
             arcade.draw_rectangle_filled(
