@@ -73,7 +73,7 @@ class RadialBullet(Bullet):
             self.speed = max(100, self.speed - self.slowing_rate * delta_time)
 
 
-class CircleFire(DartingEnemy):
+class Bomber(DartingEnemy):
     RADIUS = 15
     INIT_HP = 20
 
@@ -87,7 +87,7 @@ class CircleFire(DartingEnemy):
         fire_radii: list[int] = None,
     ):
         super().__init__(
-            CircleFire.RADIUS, x, y, stage, CircleFire.INIT_HP, interval=interval
+            Bomber.RADIUS, x, y, stage, Bomber.INIT_HP, interval=interval
         )
         self.bullet_counts = bullet_counts
         self.bullets_active = []
@@ -160,13 +160,13 @@ class CircleFire(DartingEnemy):
         super().on_die()
 
 
-class Zeppelin(CircleFire, Boss):
+class Zeppelin(Bomber, Boss):
     INIT_HP = 45
 
     def __init__(self, stage: Stage):
         super().__init__(
             WIDTH / 3,
-            HEIGHT + CircleFire.RADIUS,
+            HEIGHT + Bomber.RADIUS,
             stage,
             interval=0.5,
             bullet_counts=[15, 19, 22, 25],

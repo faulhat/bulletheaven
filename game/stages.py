@@ -1,7 +1,7 @@
 import arcade
 
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
-from l2enemies import CircleFire, Zeppelin
+from l2enemies import Bomber, Zeppelin
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -119,10 +119,9 @@ class L1Stage4(Stage):
         self.counter = 0
         self.turrets = arcade.SpriteList()
         self.turrets_wait = False
-        self.stage_stopwatch = 0
 
     def inc_stage(self):
-        self.window.show_view(L1BossStage(self))
+        self.window.show_view(L1Boss(self))
 
     def make_turrets(self):
         turret_a: Turret
@@ -165,7 +164,7 @@ class L1Stage4(Stage):
                 self.make_turrets()
 
 
-class L1BossStage(BossStage):
+class L1Boss(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level One Boss - Wormwood"
@@ -190,7 +189,7 @@ class L2Stage1(Stage):
 
     def start_stage(self):
         super().start_stage()
-        CircleFire(WIDTH / 3, HEIGHT + CircleFire.RADIUS, self)
+        Bomber(WIDTH / 3, HEIGHT + Bomber.RADIUS, self)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -198,7 +197,7 @@ class L2Stage1(Stage):
             self.intro_new_enemy_watch += delta_time
 
             if self.intro_new_enemy_watch > 1:
-                CircleFire(WIDTH * 2 / 3, HEIGHT + CircleFire.RADIUS, self)
+                Bomber(WIDTH * 2 / 3, HEIGHT + Bomber.RADIUS, self)
                 self.new_enemy_introduced = True
 
 
@@ -212,31 +211,42 @@ class L2Stage2(Stage):
 
     def start_stage(self):
         super().start_stage()
-        CircleFire(WIDTH / 4, HEIGHT + CircleFire.RADIUS, self, interval=1.5)
-        CircleFire(WIDTH * 3 / 4, HEIGHT + CircleFire.RADIUS, self, interval=1.5)
+        Bomber(WIDTH / 4, HEIGHT + Bomber.RADIUS, self, interval=1.5)
+        Bomber(WIDTH * 3 / 4, HEIGHT + Bomber.RADIUS, self, interval=1.5)
         SeaStar(WIDTH / 3, HEIGHT + SeaStar.RADIUS, self)
 
 
-# class L2Stage3(L1Stage2):
-class L2Stage3(Stage):
+class L2Stage3(L1Stage2):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level Two - Stage Three"
 
     def inc_stage(self):
-        self.window.show_view(L2BossStage(self))
+        self.window.show_view(L2Boss(self))
 
     def start_stage(self):
-        super().start_stage()
-        CircleFire(
+        Stage.start_stage(self)
+
+        SeaStar(
+            WIDTH * 3/4,
+            HEIGHT + SeaStar.RADIUS,
+            self,
+            n_spines=3,
+            n_bullets=5,
+        )
+
+        Bomber(
             WIDTH / 4,
-            HEIGHT + CircleFire.RADIUS,
+            HEIGHT + Bomber.RADIUS,
             self,
             bullet_counts=[6, 6],
         )
+    
+    def stage_update(self, delta_time: float):
+        super().stage_update(delta_time)
 
 
-class L2BossStage(BossStage):
+class L2Boss(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level Two Boss - Zeppelin"
