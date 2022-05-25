@@ -182,8 +182,7 @@ class Stage(arcade.View):
             if hits:
                 enemy.hp -= 1
                 if enemy.hp == 0:
-                    enemy.remove_from_sprite_lists()
-                    self.player.inc_score()
+                    enemy.on_die()
                 else:
                     enemy.on_hit()
 
@@ -212,3 +211,25 @@ class Stage(arcade.View):
 
         if self.in_transition:
             self.transition_label.draw()
+
+
+class Boss(arcade.SpriteCircle):
+    hp: int
+    hp_label: arcade.Text
+
+
+class BossStage(Stage):
+    boss: Boss
+
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+
+    def stage_update(self, delta_time: float):
+        super().stage_update(delta_time)
+        if self.boss.hp == 0:
+            self.boss.hp_label.text = "Boss Vanquished!"
+
+    def on_draw(self):
+        super().on_draw()
+        if not self.in_transition:
+            self.boss.draw_hp_bar()

@@ -1,7 +1,7 @@
 import arcade
 
 from infoscreen import InfoScreen
-from l2stages import L2Stage1
+from stages import *
 
 
 class Instructions(InfoScreen):
@@ -37,5 +37,5 @@ class Instructions(InfoScreen):
                 font_name="PressStart2P",
                 anchor_x="center",
             ),
-            L2Stage1(),
+            L2Stage3(),
         )

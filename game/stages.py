@@ -1,7 +1,8 @@
 import arcade
 
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
-from stage import Stage
+from l2enemies import CircleFire, Zeppelin
+from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
 
@@ -164,29 +165,88 @@ class L1Stage4(Stage):
                 self.make_turrets()
 
 
-class L1BossStage(Stage):
-    boss: Wormwood
-
+class L1BossStage(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
-        self.transition_label.text = "Level One - Boss Battle!"
+        self.transition_label.text = "Level One Boss - Wormwood"
+
+    def inc_stage(self):
+        self.window.show_view(L2Stage1(self))
+
+    def start_stage(self):
+        super().start_stage()
+        self.boss = Wormwood(self)
+
+
+class L2Stage1(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Two - Stage One"
+        self.intro_new_enemy_watch = 0
+        self.new_enemy_introduced = False
+
+    def inc_stage(self):
+        self.window.show_view(L2Stage2(self))
+
+    def start_stage(self):
+        super().start_stage()
+        CircleFire(WIDTH / 3, HEIGHT + CircleFire.RADIUS, self)
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+        if not self.new_enemy_introduced:
+            self.intro_new_enemy_watch += delta_time
+
+            if self.intro_new_enemy_watch > 1:
+                CircleFire(WIDTH * 2 / 3, HEIGHT + CircleFire.RADIUS, self)
+                self.new_enemy_introduced = True
+
+
+class L2Stage2(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Two - Stage Two"
+
+    def inc_stage(self):
+        self.window.show_view(L2Stage3(self))
+
+    def start_stage(self):
+        super().start_stage()
+        CircleFire(WIDTH / 4, HEIGHT + CircleFire.RADIUS, self, interval=1.5)
+        CircleFire(WIDTH * 3 / 4, HEIGHT + CircleFire.RADIUS, self, interval=1.5)
+        SeaStar(WIDTH / 3, HEIGHT + SeaStar.RADIUS, self)
+
+
+# class L2Stage3(L1Stage2):
+class L2Stage3(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Two - Stage Three"
+
+    def inc_stage(self):
+        self.window.show_view(L2BossStage(self))
+
+    def start_stage(self):
+        super().start_stage()
+        CircleFire(
+            WIDTH / 4,
+            HEIGHT + CircleFire.RADIUS,
+            self,
+            bullet_counts=[6, 6],
+        )
+
+
+class L2BossStage(BossStage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Two Boss - Zeppelin"
 
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
 
     def start_stage(self):
         super().start_stage()
-        self.boss = Wormwood(self)
-
-    def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-        if self.boss.hp == 0:
-            self.boss.hp_label.text = "Boss Vanquished!"
-
-    def on_draw(self):
-        super().on_draw()
-        if not self.in_transition:
-            self.boss.draw_hp_bar()
+        self.boss = Zeppelin(self)
 
 
 class ToEnd(Stage):

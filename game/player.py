@@ -31,8 +31,8 @@ class Player(arcade.SpriteCircle):
         self.invincible = False
         self.hp_label = arcade.Text(
             f"HP: {self.hp}",
-            stage.window.width - 30,
-            stage.window.height - 70,
+            WIDTH - 30,
+            HEIGHT - 70,
             anchor_x="right",
             font_name="PressStart2P",
             font_size=18,
@@ -41,7 +41,7 @@ class Player(arcade.SpriteCircle):
         self.score_label = arcade.Text(
             f"SCORE: {self.score}",
             30,
-            stage.window.height - 70,
+            HEIGHT - 70,
             font_name="PressStart2P",
             font_size=18,
         )

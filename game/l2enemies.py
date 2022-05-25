@@ -3,7 +3,8 @@ from random import random
 import arcade
 
 from bullets import Bullet
-from l1enemies import Enemy, DartingEnemy
+from enemy import Enemy, Boss
+from l1enemies import DartingEnemy
 from stage import Stage
 from constants import *
 
@@ -17,22 +18,30 @@ class RadialBullet(Bullet):
     STATE_CIRCLE_FORMATION = 0
     STATE_FREEZE = 1
     STATE_FIRE = 2
-    SPEED = 300
+    INIT_SPEED = 1000
+    SLOWING_RATE = 200
 
-    def __init__(self, shooter: Enemy, angle: float, go_distance: float):
+    def __init__(self, shooter: Enemy, angle: float, go_distance: float, speed: float = None, slowing_rate: float = None):
         self.origin_x = shooter.position[0] + math.cos(angle) * shooter.width / 2
         self.origin_y = shooter.position[1] + math.sin(angle) * shooter.width / 2
+        if speed is None:
+            speed = RadialBullet.INIT_SPEED
+        
+        if slowing_rate is None:
+            slowing_rate = RadialBullet.SLOWING_RATE
+
         super().__init__(
             RadialBullet.RADIUS,
             arcade.csscolor.VIOLET,
             self.origin_x,
             self.origin_y,
             angle,
-            RadialBullet.SPEED,
+            RadialBullet.INIT_SPEED,
             shooter.stage,
         )
         self.state = RadialBullet.STATE_CIRCLE_FORMATION
         self.go_distance = go_distance
+        self.slowing_rate = slowing_rate
 
     def go_fire(self, target_x: float, target_y: float):
         self.state = RadialBullet.STATE_FIRE
@@ -54,13 +63,14 @@ class RadialBullet(Bullet):
                 change_y = math.sin(self.angle) * delta_time * self.speed
             else:
                 self.state = RadialBullet.STATE_FREEZE
-            
+
             self.set_position(x + change_x, y + change_y)
             if self.out_of_bounds():
                 self.set_position(x, y)
                 self.state = RadialBullet.STATE_FREEZE
         elif self.state == RadialBullet.STATE_FIRE:
             super().on_update(delta_time)
+            self.speed = max(100, self.speed - self.slowing_rate * delta_time)
 
 
 class CircleFire(DartingEnemy):
@@ -72,19 +82,31 @@ class CircleFire(DartingEnemy):
         x: float,
         y: float,
         stage: Stage,
-        n_bullets: int = 15,
         interval: float = 0.7,
-        fire_radius: float = 100,
+        bullet_counts: list[int] = None,
+        fire_radii: list[int] = None,
     ):
         super().__init__(
             CircleFire.RADIUS, x, y, stage, CircleFire.INIT_HP, interval=interval
         )
-        self.n_bullets = n_bullets
-        self.counter = 0
-        self.bullets_active = arcade.SpriteList()
+        self.bullet_counts = bullet_counts
+        self.bullets_active = []
         self.shooting = False
         self.angle = 0
-        self.fire_radius = fire_radius
+        if bullet_counts:
+            self.bullet_counts = bullet_counts
+        else:
+            self.bullet_counts = [15]
+
+        self.n_rounds = len(self.bullet_counts)
+        if fire_radii:
+            self.fire_radii = fire_radii
+        else:
+            self.fire_radii = [50 + i * 30 for i in range(self.n_rounds)]
+
+        self.round = 0
+        self.counter_in_round = 0
+        self.waiting_on_round = 0
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -96,25 +118,72 @@ class CircleFire(DartingEnemy):
             else:
                 self.dart_update()
         else:
-            if self.stopwatch > self.interval / self.n_bullets:
+            if self.stopwatch > self.interval / self.bullet_counts[self.round]:
                 self.stopwatch = 0
-                self.counter += 1
-                if self.counter > self.n_bullets:
-                    all_bullets_out = True
-                    for bullet in self.bullets_active:
-                        if bullet.state != RadialBullet.STATE_FREEZE:
-                            all_bullets_out = False
-
-                    if all_bullets_out:
-                        for bullet in self.bullets_active:
-                            bullet.go_fire(*self.stage.player.position)
-                        
-                        self.bullets_active.clear()
-                        self.shooting = False
-                        self.counter = 0
-                        self.rand_next()
-                else:
-                    self.angle += math.pi * 2 / self.n_bullets
+                if self.counter_in_round == self.bullet_counts[self.round]:
+                    if self.round < self.n_rounds - 1:
+                        self.counter_in_round = 0
+                        self.round += 1
+                elif self.round < self.n_rounds:
+                    self.counter_in_round += 1
+                    self.angle += math.pi * 2 / self.bullet_counts[self.round]
                     self.bullets_active.append(
-                        RadialBullet(self, self.angle, self.fire_radius)
+                        RadialBullet(self, self.angle, self.fire_radii[self.round])
                     )
+
+            bullet_count = self.bullet_counts[self.waiting_on_round]
+            if len(self.bullets_active) >= bullet_count:
+                all_bullets_out = True
+                for bullet in self.bullets_active[:bullet_count]:
+                    if bullet.state != RadialBullet.STATE_FREEZE:
+                        all_bullets_out = False
+
+                if all_bullets_out:
+                    for bullet in self.bullets_active[:bullet_count]:
+                        bullet.go_fire(*self.stage.player.position)
+
+                    self.bullets_active = self.bullets_active[bullet_count:]
+                    self.waiting_on_round += 1
+                    if self.waiting_on_round == self.n_rounds:
+                        self.round = 0
+                        self.waiting_on_round = 0
+                        self.counter_in_round = 0
+                        self.bullets_active = []
+                        self.shooting = False
+                        self.rand_next()
+
+    def on_die(self):
+        for bullet in self.bullets_active:
+            bullet.go_fire(*self.stage.player.position)
+
+        self.bullets_active = []
+        super().on_die()
+
+
+class Zeppelin(CircleFire, Boss):
+    INIT_HP = 45
+
+    def __init__(self, stage: Stage):
+        super().__init__(
+            WIDTH / 3,
+            HEIGHT + CircleFire.RADIUS,
+            stage,
+            interval=0.5,
+            bullet_counts=[15, 19, 22, 25],
+            fire_radii=[50, 100, 125, 150],
+        )
+
+        self.hp = Zeppelin.INIT_HP
+        self.hp_label = arcade.Text(
+            f"Zeppelin's HP: {Zeppelin.INIT_HP}",
+            20,
+            HEIGHT - Zeppelin.HP_BAR_HEIGHT / 2,
+            arcade.csscolor.RED,
+            font_size=18,
+            font_name="PressStart2P",
+            anchor_y="center",
+        )
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+        self.hp_label.text = f"Zeppelin's HP: {self.hp}"

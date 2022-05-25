@@ -2,6 +2,7 @@ import math
 from random import random
 import arcade
 
+from enemy import Enemy, Boss
 from bullets import Bullet
 from stage import Stage
 from constants import *
@@ -10,42 +11,6 @@ from constants import *
 class BasicBullet(Bullet):
     def __init__(self, x: float, y: float, angle: float, stage: Stage):
         super().__init__(8, arcade.csscolor.VIOLET, x, y, angle, 400, stage)
-
-
-class Enemy(arcade.SpriteCircle):
-    def __init__(
-        self,
-        radius: int,
-        x: float,
-        y: float,
-        stage: Stage,
-        init_hp: int,
-    ):
-        super().__init__(radius, arcade.csscolor.LIGHT_GREEN)
-        self.normal_texture = self.texture
-        self.on_hit_texture = arcade.make_circle_texture(
-            radius * 2, arcade.csscolor.RED
-        )
-
-        self.set_position(x, y)
-        stage.enemies.append(self)
-        self.stage = stage
-        self.hp = init_hp
-        self.hit = False
-        self.hit_wait_clock = 0
-        self.hit_counter = 0
-
-    def on_hit(self):
-        self.hit_wait_clock = 0
-        self.hit = True
-        self.texture = self.on_hit_texture
-
-    def on_update(self, delta_time: float):
-        self.hit_wait_clock += delta_time
-        if self.hit:
-            if self.hit_wait_clock > 0.1:
-                self.hit = False
-                self.texture = self.normal_texture
 
 
 class DartingEnemy(Enemy):
@@ -140,8 +105,8 @@ class FallingStar(Enemy):
     angle: float
 
     def __init__(self, x: float, stage: Stage):
-        super().__init__(15, x, stage.window.height + 10, stage, 5)
-        self.target_x = stage.window.width - x
+        super().__init__(15, x, HEIGHT + 10, stage, 5)
+        self.target_x = WIDTH - x
         self.target_y = -10
         self.stopwatch = 0
 
@@ -149,7 +114,7 @@ class FallingStar(Enemy):
             # Avoid division by zero.
             self.angle = math.pi * 3 / 2
         else:
-            self.angle = math.atan2(-(stage.window.height + 20), self.target_x - x)
+            self.angle = math.atan2(-(HEIGHT + 20), self.target_x - x)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -221,14 +186,13 @@ class Turret(Enemy):
             )
 
 
-class Wormwood(SeaStar):
+class Wormwood(SeaStar, Boss):
     INIT_HP = 40
-    HP_BAR_HEIGHT = 30
 
     def __init__(self, stage: Stage):
         super().__init__(
-            stage.window.width * 2 / 3,
-            stage.window.height + SeaStar.RADIUS,
+            WIDTH * 2 / 3,
+            HEIGHT + SeaStar.RADIUS,
             stage,
             n_spines=7,
             interval=0.75,
@@ -237,7 +201,7 @@ class Wormwood(SeaStar):
 
         self.hp = Wormwood.INIT_HP
         self.hp_label = arcade.Text(
-            f"Boss HP: {Wormwood.INIT_HP}",
+            f"Wormwood's HP: {Wormwood.INIT_HP}",
             20,
             HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
             arcade.csscolor.RED,
@@ -248,15 +212,4 @@ class Wormwood(SeaStar):
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
-        self.hp_label.text = f"Boss HP: {self.hp}"
-
-    def draw_hp_bar(self):
-        arcade.draw_rectangle_filled(
-            self.hp / Wormwood.INIT_HP * WIDTH / 2,
-            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
-            self.hp / Wormwood.INIT_HP * WIDTH,
-            Wormwood.HP_BAR_HEIGHT,
-            arcade.csscolor.GREEN,
-        )
-
-        self.hp_label.draw()
+        self.hp_label.text = f"Wormwood's HP: {self.hp}"
