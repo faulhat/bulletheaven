@@ -54,16 +54,21 @@ class Player(arcade.SpriteCircle):
 
         self.n_continues = 2
 
+    def set_score(self, score: int):
+        self.score = score
+        self.score_label.text = f"SCORE: {self.score}"
+
     def set_hp(self, hp: int):
         self.hp = hp
         self.hp_label.text = f"HP: {hp}"
 
     def inc_score(self, n: int = 1):
-        self.score += n
+        for _ in range(n):
+            self.score += 1
+            if self.score % 5 == 0:
+                self.set_hp(self.hp + 1)
+            
         self.score_label.text = f"SCORE: {self.score}"
-
-        if self.score % 5 == 0:
-            self.set_hp(self.hp + 1)
 
     def set_position(self, x: float, y: float):
         x = min(

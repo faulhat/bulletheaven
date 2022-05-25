@@ -1,3 +1,4 @@
+from abc import abstractproperty
 import arcade
 
 from constants import *
@@ -8,6 +9,8 @@ class Stage(arcade.View):
 
 
 class Enemy(arcade.SpriteCircle):
+    COLOR: arcade.Color
+
     def __init__(
         self,
         radius: int,
@@ -16,7 +19,7 @@ class Enemy(arcade.SpriteCircle):
         stage: Stage,
         init_hp: int,
     ):
-        super().__init__(radius, arcade.csscolor.LIGHT_GREEN)
+        super().__init__(radius, self.COLOR)
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
             radius * 2, arcade.csscolor.RED
@@ -49,18 +52,34 @@ class Enemy(arcade.SpriteCircle):
 
 class Boss:
     HP_BAR_HEIGHT = 30
-    INIT_HP: int
+    BOSS_INIT_HP: int
+    NAME: str
 
     hp: int
     hp_label: arcade.Text
 
+    def __init__(self):
+        self.hp = self.BOSS_INIT_HP
+        self.hp_label = arcade.Text(
+            f"{self.NAME}'s HP: {self.BOSS_INIT_HP}",
+            20,
+            HEIGHT - self.HP_BAR_HEIGHT / 2,
+            arcade.csscolor.RED,
+            font_size=18,
+            font_name="PressStart2P",
+            anchor_y="center",
+        )
+
     def draw_hp_bar(self):
         arcade.draw_rectangle_filled(
-            self.hp / self.INIT_HP * WIDTH / 2,
+            self.hp / self.BOSS_INIT_HP * WIDTH / 2,
             HEIGHT - Boss.HP_BAR_HEIGHT / 2,
-            self.hp / self.INIT_HP * WIDTH,
+            self.hp / self.BOSS_INIT_HP * WIDTH,
             Boss.HP_BAR_HEIGHT,
             arcade.csscolor.GREEN,
         )
 
         self.hp_label.draw()
+
+    def update_hp_bar(self):
+        self.hp_label.text = f"{self.NAME}'s HP: {self.hp}"

@@ -47,6 +47,7 @@ class DartingEnemy(Enemy):
 
 class SeaStar(DartingEnemy):
     RADIUS = 15
+    COLOR = arcade.csscolor.PINK
 
     def __init__(
         self,
@@ -101,6 +102,7 @@ class SeaStar(DartingEnemy):
 
 class FallingStar(Enemy):
     SPEED = 300
+    COLOR = arcade.csscolor.DEEP_SKY_BLUE
 
     angle: float
 
@@ -139,6 +141,7 @@ class Turret(Enemy):
     LEFT = -1
     RIGHT = 1
     RADIUS = 12
+    COLOR = arcade.csscolor.GREENYELLOW
 
     def __init__(
         self,
@@ -187,10 +190,13 @@ class Turret(Enemy):
 
 
 class Wormwood(SeaStar, Boss):
-    INIT_HP = 40
+    BOSS_INIT_HP = 40
+    COLOR = arcade.csscolor.BEIGE
+    NAME = "Wormwood"
 
     def __init__(self, stage: Stage):
-        super().__init__(
+        SeaStar.__init__(
+            self,
             WIDTH * 2 / 3,
             HEIGHT + SeaStar.RADIUS,
             stage,
@@ -199,17 +205,8 @@ class Wormwood(SeaStar, Boss):
             double=True,
         )
 
-        self.hp = Wormwood.INIT_HP
-        self.hp_label = arcade.Text(
-            f"Wormwood's HP: {Wormwood.INIT_HP}",
-            20,
-            HEIGHT - Wormwood.HP_BAR_HEIGHT / 2,
-            arcade.csscolor.RED,
-            font_size=18,
-            font_name="PressStart2P",
-            anchor_y="center",
-        )
-
+        Boss.__init__(self)
+    
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
-        self.hp_label.text = f"Wormwood's HP: {self.hp}"
+        SeaStar.on_update(self, delta_time)
+        self.update_hp_bar()

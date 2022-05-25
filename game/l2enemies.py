@@ -75,6 +75,7 @@ class RadialBullet(Bullet):
 
 class Bomber(DartingEnemy):
     RADIUS = 15
+    COLOR = arcade.csscolor.CORAL
     INIT_HP = 20
 
     def __init__(
@@ -161,10 +162,13 @@ class Bomber(DartingEnemy):
 
 
 class Zeppelin(Bomber, Boss):
-    INIT_HP = 45
+    COLOR = arcade.csscolor.WHITE_SMOKE
+    BOSS_INIT_HP = 45
+    NAME = "Zeppelin"
 
     def __init__(self, stage: Stage):
-        super().__init__(
+        Bomber.__init__(
+            self,
             WIDTH / 3,
             HEIGHT + Bomber.RADIUS,
             stage,
@@ -173,17 +177,8 @@ class Zeppelin(Bomber, Boss):
             fire_radii=[50, 100, 125, 150],
         )
 
-        self.hp = Zeppelin.INIT_HP
-        self.hp_label = arcade.Text(
-            f"Zeppelin's HP: {Zeppelin.INIT_HP}",
-            20,
-            HEIGHT - Zeppelin.HP_BAR_HEIGHT / 2,
-            arcade.csscolor.RED,
-            font_size=18,
-            font_name="PressStart2P",
-            anchor_y="center",
-        )
-
+        Boss.__init__(self)
+    
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
-        self.hp_label.text = f"Zeppelin's HP: {self.hp}"
+        Bomber.on_update(self, delta_time)
+        self.update_hp_bar()

@@ -51,6 +51,7 @@ class ContinueMenu(Menu):
 
     def use_continue(self):
         self.stage.player.invincible = True
+        self.stage.player.set_score(0)
         self.stage.player.set_hp(Player.INIT_HP)
         self.stage.player.n_continues -= 1
         self.window.show_view(self.stage)

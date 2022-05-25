@@ -90,7 +90,7 @@ class L1Stage3(Stage):
         super().stage_update(delta_time)
         if self.stage_stopwatch > 15:
             self.stage_stopwatch = 0
-            if len(self.sea_stars) == 1 and self.counter < 3:
+            if len(self.sea_stars) == 1 and self.counter < 2:
                 self.counter += 1
                 self.sea_stars.append(
                     SeaStar(
