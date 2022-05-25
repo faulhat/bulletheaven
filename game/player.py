@@ -15,7 +15,7 @@ class FriendlyBullet(Bullet):
 class Player(arcade.SpriteCircle):
     RADIUS = 15
     SPEED = 400
-    INIT_HP = 8
+    INIT_HP = 10
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
         super().__init__(Player.RADIUS, arcade.csscolor.WHITE)

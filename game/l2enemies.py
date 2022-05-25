@@ -71,12 +71,16 @@ class RadialBullet(Bullet):
         elif self.state == RadialBullet.STATE_FIRE:
             super().on_update(delta_time)
             self.speed = max(100, self.speed - self.slowing_rate * delta_time)
+    
+    def remove_from_sprite_lists(self):
+        self.state = RadialBullet.STATE_FREEZE
+        super().remove_from_sprite_lists()
 
 
 class Bomber(DartingEnemy):
     RADIUS = 15
-    COLOR = arcade.csscolor.CORAL
-    INIT_HP = 20
+    COLOR = arcade.csscolor.ALICE_BLUE
+    INIT_HP = 15
 
     def __init__(
         self,
