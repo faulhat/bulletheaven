@@ -7,13 +7,15 @@ from stages import *
 class Instructions(InfoScreen):
     INSTRUCTIONS = [
         "INSTRUCTIONS",
-        "Use the arrow keys to move",
+        "Use the arrow keys or WASD to move",
         "Use X to pause",
-        "Hold S to slow down",
+        "Hold Z to slow down",
         "Avoid the bullets (hollow)",
-        "Try to hit the enemies (solid)",
+        "Shoot the enemies (solid)",
         "When you kill an enemy you score a point",
         "5 points = 1 HP",
+        "Grab the charms (square)",
+        "Press Q to use a charm and enter serenity mode.",
     ]
 
     def __init__(self):

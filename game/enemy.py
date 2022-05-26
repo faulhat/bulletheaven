@@ -1,7 +1,9 @@
 from abc import abstractproperty
+from random import random
 import arcade
 
 from constants import *
+from charm import Charm
 
 
 class Stage(arcade.View):
@@ -18,6 +20,7 @@ class Enemy(arcade.SpriteCircle):
         y: float,
         stage: Stage,
         init_hp: int,
+        drop_chance: float = 0.2,
     ):
         super().__init__(radius, self.COLOR)
         self.normal_texture = self.texture
@@ -32,6 +35,7 @@ class Enemy(arcade.SpriteCircle):
         self.hit = False
         self.hit_wait_clock = 0
         self.hit_counter = 0
+        self.drop_chance = drop_chance
 
     def on_hit(self):
         self.hit_wait_clock = 0
@@ -44,10 +48,24 @@ class Enemy(arcade.SpriteCircle):
             if self.hit_wait_clock > 0.1:
                 self.hit = False
                 self.texture = self.normal_texture
+        
+        hits = self.collides_with_list(self.stage.friendly)
+        if hits:
+            self.hp -= 1
+            if self.hp == 0:
+                self.on_die()
+            else:
+                self.on_hit()
+
+            for player_bullet in hits:
+                player_bullet.remove_from_sprite_lists()
 
     def on_die(self):
         self.remove_from_sprite_lists()
         self.stage.player.inc_score()
+
+        if random() < self.drop_chance:
+            Charm(self.position[0], self.position[1], self.stage)
 
 
 class Boss:

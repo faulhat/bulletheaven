@@ -41,8 +41,8 @@ class DartingEnemy(Enemy):
         self.set_position(x, y)
 
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
         self.stopwatch += delta_time
+        super().on_update(delta_time)
 
 
 class SeaStar(DartingEnemy):

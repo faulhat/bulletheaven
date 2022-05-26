@@ -114,8 +114,6 @@ class Bomber(DartingEnemy):
         self.waiting_on_round = 0
 
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
-
         if not self.shooting:
             if self.stopwatch > self.interval:
                 self.stopwatch = 0
@@ -156,6 +154,8 @@ class Bomber(DartingEnemy):
                         self.bullets_active = []
                         self.shooting = False
                         self.rand_next()
+        
+        super().on_update(delta_time)
 
     def on_die(self):
         for bullet in self.bullets_active:
