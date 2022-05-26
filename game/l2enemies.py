@@ -79,7 +79,7 @@ class RadialBullet(Bullet):
         super().remove_from_sprite_lists()
 
 
-class Bomber(DartingEnemy):
+class Balloon(DartingEnemy):
     RADIUS = 15
     COLOR = arcade.csscolor.ALICE_BLUE
     INIT_HP = 15
@@ -93,7 +93,9 @@ class Bomber(DartingEnemy):
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(Bomber.RADIUS, x, y, stage, Bomber.INIT_HP, interval=interval)
+        super().__init__(
+            Balloon.RADIUS, x, y, stage, Balloon.INIT_HP, interval=interval
+        )
         self.bullet_counts = bullet_counts
         self.bullets_active = []
         self.shooting = False
@@ -165,16 +167,16 @@ class Bomber(DartingEnemy):
         super().on_die()
 
 
-class Zeppelin(Bomber, Boss):
+class Zeppelin(Balloon, Boss):
     COLOR = arcade.csscolor.WHITE_SMOKE
     BOSS_INIT_HP = 45
     NAME = "Zeppelin"
 
     def __init__(self, stage: Stage):
-        Bomber.__init__(
+        Balloon.__init__(
             self,
             WIDTH / 3,
-            HEIGHT + Bomber.RADIUS,
+            HEIGHT + Balloon.RADIUS,
             stage,
             interval=0.5,
             bullet_counts=[15, 19, 22, 25],
@@ -184,5 +186,5 @@ class Zeppelin(Bomber, Boss):
         Boss.__init__(self)
 
     def on_update(self, delta_time: float):
-        Bomber.on_update(self, delta_time)
+        Balloon.on_update(self, delta_time)
         self.update_hp_bar()

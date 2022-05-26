@@ -1,7 +1,7 @@
 import arcade
 
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
-from l2enemies import Bomber, Zeppelin
+from l2enemies import Balloon, Zeppelin
 from l3enemies import AimingTurret, FireBomber
 from stage import Stage, BossStage
 from gameover import YouWin
@@ -25,6 +25,7 @@ class L1Stage1(Stage):
             self,
             interval=2,
         )
+
 
 class L1Stage2(Stage):
     def __init__(self, previous: Stage = None):
@@ -186,7 +187,7 @@ class L2Stage1(Stage):
 
     def start_stage(self):
         super().start_stage()
-        Bomber(WIDTH / 3, HEIGHT + Bomber.RADIUS, self)
+        Balloon(WIDTH / 3, HEIGHT + Balloon.RADIUS, self)
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -194,7 +195,7 @@ class L2Stage1(Stage):
             self.intro_new_enemy_watch += delta_time
 
             if self.intro_new_enemy_watch > 1:
-                Bomber(WIDTH * 2 / 3, HEIGHT + Bomber.RADIUS, self)
+                Balloon(WIDTH * 2 / 3, HEIGHT + Balloon.RADIUS, self)
                 self.new_enemy_introduced = True
 
 
@@ -208,8 +209,8 @@ class L2Stage2(Stage):
 
     def start_stage(self):
         super().start_stage()
-        Bomber(WIDTH / 4, HEIGHT + Bomber.RADIUS, self, interval=1.5)
-        Bomber(WIDTH * 3 / 4, HEIGHT + Bomber.RADIUS, self, interval=1.5)
+        Balloon(WIDTH / 4, HEIGHT + Balloon.RADIUS, self, interval=1.5)
+        Balloon(WIDTH * 3 / 4, HEIGHT + Balloon.RADIUS, self, interval=1.5)
         SeaStar(WIDTH / 3, HEIGHT + SeaStar.RADIUS, self)
 
 
@@ -232,9 +233,9 @@ class L2Stage3(L1Stage2):
             n_bullets=5,
         )
 
-        Bomber(
+        Balloon(
             WIDTH / 4,
-            HEIGHT + Bomber.RADIUS,
+            HEIGHT + Balloon.RADIUS,
             self,
             bullet_counts=[6, 6],
         )
@@ -262,25 +263,96 @@ class L3Stage1(Stage):
         self.transition_label.text = "Level Three - Stage One"
         self.direction_switch = LEFT
         self.turret_counter = 0
-    
+
     def make_turrets(self):
-        AimingTurret(HEIGHT * 6/8, self, self.direction_switch)
-        AimingTurret(HEIGHT * 7/8, self, -self.direction_switch)
+        AimingTurret(HEIGHT * 6 / 8, self, self.direction_switch)
+        AimingTurret(HEIGHT * 7 / 8, self, -self.direction_switch)
         self.direction_switch *= -1
         self.turret_counter += 1
 
     def inc_stage(self):
-        self.window.show_view(ToEnd(self))
-    
+        self.window.show_view(L3Stage2(self))
+
     def start_stage(self):
         super().start_stage()
-        FireBomber(WIDTH + 10, HEIGHT + 10, self)
-    
+        FireBomber(WIDTH + FireBomber.RADIUS, HEIGHT + FireBomber.RADIUS, self)
+
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
-        if self.stage_stopwatch > (WIDTH - 50) / AimingTurret.SPEED and self.turret_counter < 3:
+        if (
+            self.stage_stopwatch > (WIDTH - 50) / AimingTurret.SPEED
+            and self.turret_counter < 3
+        ):
             self.make_turrets()
             self.stage_stopwatch = 0
+
+
+class L3Stage2(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Three - The Gauntlet"
+        self.mode = 0
+
+    def inc_stage(self):
+        if self.mode > 6:
+            self.window.show_view(ToEnd(self))
+        else:
+            self.next_mode()
+
+    def start_stage(self):
+        super().start_stage()
+        SeaStar(
+            WIDTH + SeaStar.RADIUS,
+            HEIGHT + SeaStar.RADIUS,
+            self,
+            n_spines=6,
+            double=True,
+        )
+
+    def next_mode(self):
+        self.mode += 1
+        if self.mode == 1:
+            SeaStar(
+                WIDTH + SeaStar.RADIUS,
+                HEIGHT + SeaStar.RADIUS,
+                self,
+                n_spines=4,
+                double=True,
+            )
+            SeaStar(
+                -SeaStar.RADIUS, HEIGHT + SeaStar.RADIUS, self, n_spines=4, double=True
+            )
+        elif self.mode == 2:
+            Balloon(
+                WIDTH * 2 / 3,
+                HEIGHT + Balloon.RADIUS,
+                self,
+                interval=1,
+                bullet_counts=[15, 15, 15],
+            )
+        elif self.mode == 3:
+            Balloon(
+                WIDTH * 2 / 5,
+                HEIGHT + Balloon.RADIUS,
+                self,
+                interval=1,
+                bullet_counts=[15, 20],
+            )
+            Balloon(
+                WIDTH * 3 / 5,
+                HEIGHT + Balloon.RADIUS,
+                self,
+                interval=1,
+                bullet_counts=[15, 20],
+            )
+        elif self.mode == 4:
+            FireBomber(
+                WIDTH / 2, HEIGHT + FireBomber.RADIUS, self, bullet_counts=[8, 10]
+            )
+        elif self.mode == 5:
+            Wormwood(self)
+        elif self.mode == 6:
+            Zeppelin(self)
 
 
 class ToEnd(Stage):
