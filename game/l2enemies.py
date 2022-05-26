@@ -1,5 +1,4 @@
 import math
-from random import random
 import arcade
 
 from bullets import Bullet

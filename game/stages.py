@@ -2,6 +2,7 @@ import arcade
 
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Bomber, Zeppelin
+from l3enemies import AimingTurret
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -24,10 +25,6 @@ class L1Stage1(Stage):
             self,
             interval=2,
         )
-
-    def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-
 
 class L1Stage2(Stage):
     def __init__(self, previous: Stage = None):
@@ -257,6 +254,19 @@ class L2Boss(BossStage):
     def start_stage(self):
         super().start_stage()
         self.boss = Zeppelin(self)
+
+
+class L3Stage1(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Level Three - Stage One"
+    
+    def inc_stage(self):
+        self.window.show_view(ToEnd(self))
+    
+    def start_stage(self):
+        super().start_stage()
+        AimingTurret(HEIGHT * 2/3, self, LEFT)
 
 
 class ToEnd(Stage):

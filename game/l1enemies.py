@@ -138,8 +138,6 @@ class FallingStar(Enemy):
 
 
 class Turret(Enemy):
-    LEFT = -1
-    RIGHT = 1
     RADIUS = 12
     COLOR = arcade.csscolor.GREENYELLOW
 
@@ -152,9 +150,9 @@ class Turret(Enemy):
     ):
         super().__init__(12, 0, y, stage, 5)
         x: float
-        if direction == Turret.LEFT:
+        if direction == LEFT:
             x = WIDTH + Turret.RADIUS
-        elif direction == Turret.RIGHT:
+        elif direction == RIGHT:
             x = -Turret.RADIUS
 
         self.set_position(x, y)
