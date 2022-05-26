@@ -213,10 +213,10 @@ class Player(arcade.SpriteCircle):
                 self.invincible = True
                 self.blinker_clock = 0
 
-            charms_caught = self.collides_with_list(self.stage.charms)
-            for charm in charms_caught:
-                charm.remove_from_sprite_lists()
-                self.inc_charms()
+        charms_caught = self.collides_with_list(self.stage.charms)
+        for charm in charms_caught:
+            charm.remove_from_sprite_lists()
+            self.inc_charms()
 
         # The player fires a steady stream of bullets
         if self.fire_clock > 0.1:
