@@ -124,11 +124,11 @@ class L1Stage4(Stage):
         turret_a: Turret
         turret_b: Turret
         if self.counter % 2 == 0:
-            turret_a = Turret(HEIGHT * 4 / 8, Turret.RIGHT, 400, self)
-            turret_b = Turret(HEIGHT * 6 / 8, Turret.LEFT, 400, self)
+            turret_a = Turret(HEIGHT * 4 / 8, RIGHT, self)
+            turret_b = Turret(HEIGHT * 6 / 8, LEFT, self)
         else:
-            turret_a = Turret(HEIGHT * 5 / 8, Turret.LEFT, 400, self)
-            turret_b = Turret(HEIGHT * 7 / 8, Turret.RIGHT, 400, self)
+            turret_a = Turret(HEIGHT * 5 / 8, LEFT, self)
+            turret_b = Turret(HEIGHT * 7 / 8, RIGHT, self)
 
         self.turrets.append(turret_a)
         self.turrets.append(turret_b)
@@ -249,7 +249,7 @@ class L2Boss(BossStage):
         self.transition_label.text = "Level Two Boss - Zeppelin"
 
     def inc_stage(self):
-        self.window.show_view(ToEnd(self))
+        self.window.show_view(L3Stage1(self))
 
     def start_stage(self):
         super().start_stage()

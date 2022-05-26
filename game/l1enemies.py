@@ -101,13 +101,14 @@ class SeaStar(DartingEnemy):
 
 
 class FallingStar(Enemy):
-    SPEED = 300
+    SPEED = 200
     COLOR = arcade.csscolor.DEEP_SKY_BLUE
+    INIT_HP = 4
 
     angle: float
 
     def __init__(self, x: float, stage: Stage):
-        super().__init__(15, x, HEIGHT + 10, stage, 5)
+        super().__init__(15, x, HEIGHT + 10, stage, init_hp=FallingStar.INIT_HP)
         self.target_x = WIDTH - x
         self.target_y = -10
         self.stopwatch = 0
@@ -140,15 +141,16 @@ class FallingStar(Enemy):
 class Turret(Enemy):
     RADIUS = 12
     COLOR = arcade.csscolor.GREENYELLOW
+    INIT_HP = 4
+    SPEED = 250
 
     def __init__(
         self,
         y: float,
         direction: int,
-        speed: float,
         stage: Stage,
     ):
-        super().__init__(12, 0, y, stage, 5)
+        super().__init__(12, 0, y, stage, init_hp=Turret.INIT_HP)
         x: float
         if direction == LEFT:
             x = WIDTH + Turret.RADIUS
@@ -156,7 +158,7 @@ class Turret(Enemy):
             x = -Turret.RADIUS
 
         self.set_position(x, y)
-        self.speed = speed
+        self.speed = Turret.SPEED
 
         # Direction should be -1 for left and 1 for right
         self.direction = direction

@@ -117,6 +117,7 @@ class FireBomber(DartingEnemy):
                     self.bullets_active = []
                     self.round += 1
                     if self.round == self.n_rounds:
+                        self.stopwatch = 0
                         self.round = 0
                         self.shooting = False
                         self.rand_next()
