@@ -15,7 +15,7 @@ class Instructions(InfoScreen):
         "When you kill an enemy you score a point",
         "5 points = 1 HP",
         "Grab the charms (square)",
-        "Press Q to use a charm and enter serenity mode.",
+        "Press Q to use a charm and enter SERENITY MODE.",
     ]
 
     def __init__(self):

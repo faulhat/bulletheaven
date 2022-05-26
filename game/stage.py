@@ -83,7 +83,7 @@ class Stage(arcade.View):
 
     def on_update(self, delta_time: float):
         if self.player.serene:
-            delta_time *= 2 / 3
+            delta_time *= 1 / 2
 
         self.stopwatch += delta_time
         if self.player.dead:
@@ -145,6 +145,27 @@ class Stage(arcade.View):
                 self.player.serene_label.content_height + 20,
                 arcade.csscolor.RED,
             )
+        elif self.player.serene:
+            if self.player.serene_clock < 6:
+                arcade.draw_rectangle_filled(
+                    self.player.serene_label.position[0]
+                    + self.player.serene_label.content_width / 2,
+                    self.player.serene_label.position[1]
+                    + self.player.serene_label.content_height / 2,
+                    self.player.serene_label.content_width + 20,
+                    self.player.serene_label.content_height + 20,
+                    arcade.csscolor.GREEN,
+                )
+            else:
+                arcade.draw_rectangle_filled(
+                    self.player.serene_label.position[0]
+                    + self.player.serene_label.content_width / 2,
+                    self.player.serene_label.position[1]
+                    + self.player.serene_label.content_height / 2,
+                    self.player.serene_label.content_width + 20,
+                    self.player.serene_label.content_height + 20,
+                    arcade.csscolor.GOLDENROD,
+                )
 
         self.player.hp_label.draw()
         self.player.score_label.draw()

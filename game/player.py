@@ -54,7 +54,7 @@ class Player(arcade.SpriteCircle):
             font_size=18,
         )
 
-        self.n_charms = 1
+        self.n_charms = 2
         self.serene_label = arcade.Text(
             f"CHARMS: {self.n_charms}",
             30,
