@@ -14,7 +14,6 @@ class RadialBullet(Bullet):
     STATE_CIRCLE_FORMATION = 0
     STATE_FREEZE = 1
     STATE_FIRE = 2
-    INIT_SPEED = 1000
     SLOWING_RATE = 200
 
     def __init__(
@@ -22,7 +21,7 @@ class RadialBullet(Bullet):
         shooter: Enemy,
         angle: float,
         go_distance: float,
-        speed: float = None,
+        speed: float = 1000,
         slowing_rate: float = None,
     ):
         self.origin_x = shooter.position[0] + math.cos(angle) * shooter.width / 2
@@ -39,7 +38,7 @@ class RadialBullet(Bullet):
             self.origin_x,
             self.origin_y,
             angle,
-            RadialBullet.INIT_SPEED,
+            speed,
             shooter.stage,
         )
         self.state = RadialBullet.STATE_CIRCLE_FORMATION

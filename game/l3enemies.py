@@ -1,8 +1,10 @@
 import math
+from random import random
 import arcade
 
 from enemy import Enemy, Boss
-from l1enemies import BasicBullet
+from l1enemies import BasicBullet, DartingEnemy
+from l2enemies import RadialBullet
 from stage import Stage
 from constants import *
 
@@ -59,3 +61,62 @@ class AimingTurret(Enemy):
                 self.remove_from_sprite_lists()
         
         self.set_position(x, y)
+
+
+class FireBomber(DartingEnemy):
+    RADIUS = 15
+    INIT_HP = 8
+    COLOR = arcade.csscolor.ORANGE
+
+    def __init__(self, x: float, y: float, stage: Stage, bullet_counts: list[int] = None, fire_radii: list[int] = None):
+        super().__init__(FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP)
+        self.bullet_counts = bullet_counts
+        self.shooting = False
+        self.bullets_active = []
+        self.round = 0
+        if bullet_counts:
+            self.bullet_counts = bullet_counts
+        else:
+            self.bullet_counts = [10]
+        
+        self.n_rounds = len(self.bullet_counts)
+        if fire_radii:
+            self.fire_radii = fire_radii
+        else:
+            self.fire_radii = [50 + 10 * i for i in range(self.n_rounds)]
+    
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+
+        if not self.shooting:
+            if self.stopwatch > self.interval:
+                self.stopwatch = 0
+                self.shooting = True
+            else:
+                self.dart_update()
+        else:
+            fire_radius = self.fire_radii[self.round]
+            bullet_count = self.bullet_counts[self.round]
+            if not self.bullets_active:
+                angle = random() * math.pi * 2
+                for _ in range(bullet_count):
+                    angle += math.pi * 2 / bullet_count
+                    self.bullets_active.append(RadialBullet(self, angle, fire_radius, speed=400, slowing_rate=0))
+            else:
+                bullets_out = True
+                for bullet in self.bullets_active:
+                    if bullet.state != RadialBullet.STATE_FREEZE:
+                        bullets_out = False
+                    
+                if bullets_out:
+                    x, y = self.position
+                    off_x, off_y = (random() * 2 - 1) * fire_radius, (random() * 2 - 1) * fire_radius
+                    for bullet in self.bullets_active:
+                        bullet.go_fire(x + off_x, y + off_y)
+                    
+                    self.bullets_active = []
+                    self.round += 1
+                    if self.round == self.n_rounds:
+                        self.round = 0
+                        self.shooting = False
+                        self.rand_next()

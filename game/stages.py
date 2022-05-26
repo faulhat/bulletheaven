@@ -2,7 +2,7 @@ import arcade
 
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Bomber, Zeppelin
-from l3enemies import AimingTurret
+from l3enemies import AimingTurret, FireBomber
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -274,7 +274,7 @@ class L3Stage1(Stage):
     
     def start_stage(self):
         super().start_stage()
-        self.make_turrets()
+        FireBomber(WIDTH + 10, HEIGHT + 10, self)
     
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
