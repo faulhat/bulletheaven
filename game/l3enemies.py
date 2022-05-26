@@ -9,7 +9,7 @@ from constants import *
 
 class AimingTurret(Enemy):
     RADIUS = 15
-    INIT_HP = 9
+    INIT_HP = 4
     COLOR = arcade.csscolor.AQUAMARINE
     SPEED = 300
 
@@ -52,10 +52,10 @@ class AimingTurret(Enemy):
         if self.direction == LEFT:
             x -= AimingTurret.SPEED * delta_time
             if x < -AimingTurret.RADIUS:
-                self.on_die()
+                self.remove_from_sprite_lists()
         elif self.direction == RIGHT:
             x += AimingTurret.SPEED * delta_time
             if x > WIDTH + AimingTurret.RADIUS:
-                self.on_die()
+                self.remove_from_sprite_lists()
         
         self.set_position(x, y)

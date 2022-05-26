@@ -260,13 +260,27 @@ class L3Stage1(Stage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level Three - Stage One"
+        self.direction_switch = LEFT
+        self.turret_counter = 0
     
+    def make_turrets(self):
+        AimingTurret(HEIGHT * 6/8, self, self.direction_switch)
+        AimingTurret(HEIGHT * 7/8, self, -self.direction_switch)
+        self.direction_switch *= -1
+        self.turret_counter += 1
+
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
     
     def start_stage(self):
         super().start_stage()
-        AimingTurret(HEIGHT * 2/3, self, LEFT)
+        self.make_turrets()
+    
+    def stage_update(self, delta_time: float):
+        super().stage_update(delta_time)
+        if self.stage_stopwatch > (WIDTH - 50) / AimingTurret.SPEED and self.turret_counter < 3:
+            self.make_turrets()
+            self.stage_stopwatch = 0
 
 
 class ToEnd(Stage):
