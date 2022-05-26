@@ -17,7 +17,7 @@ class FriendlyBullet(Bullet):
         super().__init__(
             8, arcade.csscolor.BLUE, x, y, math.pi * 1 / 2, 600, stage, friendly=True
         )
-        
+
 
 class Player(arcade.SpriteCircle):
     RADIUS = 15
@@ -88,14 +88,14 @@ class Player(arcade.SpriteCircle):
             self.score += 1
             if self.score % 5 == 0:
                 self.set_hp(self.hp + 1)
-            
+
         self.score_label.text = f"SCORE: {self.score}"
 
     def inc_charms(self, n: int = 1):
         self.n_charms += n
         if not self.serene:
             self.serene_label.text = f"CHARMS: {self.n_charms}"
-        
+
         if self.serene_denied:
             self.exit_serene_denied()
 
@@ -112,12 +112,12 @@ class Player(arcade.SpriteCircle):
             self.serene_label.text = "NO CHARMS!"
             self.serene_label.color = arcade.csscolor.BLACK
             self.serene_clock = 0
-        
+
     def exit_serene_mode(self):
         if self.serene:
             self.serene = False
             self.serene_label.text = f"CHARMS: {self.n_charms}"
-    
+
     def exit_serene_denied(self):
         if self.serene_denied:
             self.serene_denied = False
@@ -134,7 +134,7 @@ class Player(arcade.SpriteCircle):
             max(self.width / 2, y),
         )
         super().set_position(x, y)
-    
+
     def on_update(self, delta_time: float):
         self.fire_clock += delta_time
         self.serene_clock += delta_time
@@ -212,7 +212,7 @@ class Player(arcade.SpriteCircle):
 
                 self.invincible = True
                 self.blinker_clock = 0
-            
+
             charms_caught = self.collides_with_list(self.stage.charms)
             for charm in charms_caught:
                 charm.remove_from_sprite_lists()
@@ -226,7 +226,7 @@ class Player(arcade.SpriteCircle):
                 self.stage,
             )
             self.fire_clock = 0
-        
+
         if self.serene_clock > 7 and self.serene:
             self.exit_serene_mode()
         elif self.serene_clock > 1 and self.serene_denied:

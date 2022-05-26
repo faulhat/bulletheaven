@@ -70,7 +70,7 @@ class Stage(arcade.View):
         if symbol == arcade.key.X:
             self.window.show_view(PauseMenu(self))
             return
-        
+
         if symbol == arcade.key.Q:
             self.player.use_charm()
 
@@ -83,7 +83,7 @@ class Stage(arcade.View):
 
     def on_update(self, delta_time: float):
         if self.player.serene:
-            delta_time *= 2/3
+            delta_time *= 2 / 3
 
         self.stopwatch += delta_time
         if self.player.dead:
@@ -112,13 +112,15 @@ class Stage(arcade.View):
     def on_draw(self):
         self.player.draw()
         self.enemies.draw()
-        self.charms.draw()
 
-        # Bullet overrides Sprite.draw()
+        # Bullet and Charm override Sprite.draw()
         # but SpriteList.draw() doesn't actually call Sprite.draw()
+        for charm in self.charms:
+            charm.draw()
+
         for friendly_bullet in self.friendly:
             friendly_bullet.draw()
-        
+
         for bullet in self.bullets:
             bullet.draw()
 
@@ -132,7 +134,7 @@ class Stage(arcade.View):
                 self.player.hp_label.content_height + 20,
                 arcade.csscolor.RED,
             )
-        
+
         if self.player.serene_denied:
             arcade.draw_rectangle_filled(
                 self.player.serene_label.position[0]

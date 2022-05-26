@@ -228,7 +228,7 @@ class L2Stage3(L1Stage2):
         Stage.start_stage(self)
 
         SeaStar(
-            WIDTH * 3/4,
+            WIDTH * 3 / 4,
             HEIGHT + SeaStar.RADIUS,
             self,
             n_spines=3,
@@ -241,7 +241,7 @@ class L2Stage3(L1Stage2):
             self,
             bullet_counts=[6, 6],
         )
-    
+
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
 

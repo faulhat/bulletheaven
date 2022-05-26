@@ -52,4 +52,10 @@ class Bullet(arcade.SpriteCircle):
             self.remove_from_sprite_lists()
 
     def draw(self):
-        arcade.draw_circle_outline(self.position[0], self.position[1], self.width/2, self.color, border_width=2)
+        arcade.draw_circle_outline(
+            self.position[0],
+            self.position[1],
+            self.width / 2,
+            self.color,
+            border_width=2,
+        )

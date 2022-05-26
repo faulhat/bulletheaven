@@ -48,7 +48,7 @@ class Enemy(arcade.SpriteCircle):
             if self.hit_wait_clock > 0.1:
                 self.hit = False
                 self.texture = self.normal_texture
-        
+
         hits = self.collides_with_list(self.stage.friendly)
         if hits:
             self.hp -= 1

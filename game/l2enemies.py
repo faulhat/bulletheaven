@@ -7,10 +7,7 @@ from enemy import Enemy, Boss
 from l1enemies import DartingEnemy
 from stage import Stage
 from constants import *
-
-
-def distance(x1: float, y1: float, x2: float, y2: float) -> float:
-    return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
+from utils import distance
 
 
 class RadialBullet(Bullet):
@@ -21,12 +18,19 @@ class RadialBullet(Bullet):
     INIT_SPEED = 1000
     SLOWING_RATE = 200
 
-    def __init__(self, shooter: Enemy, angle: float, go_distance: float, speed: float = None, slowing_rate: float = None):
+    def __init__(
+        self,
+        shooter: Enemy,
+        angle: float,
+        go_distance: float,
+        speed: float = None,
+        slowing_rate: float = None,
+    ):
         self.origin_x = shooter.position[0] + math.cos(angle) * shooter.width / 2
         self.origin_y = shooter.position[1] + math.sin(angle) * shooter.width / 2
         if speed is None:
             speed = RadialBullet.INIT_SPEED
-        
+
         if slowing_rate is None:
             slowing_rate = RadialBullet.SLOWING_RATE
 
@@ -71,7 +75,7 @@ class RadialBullet(Bullet):
         elif self.state == RadialBullet.STATE_FIRE:
             super().on_update(delta_time)
             self.speed = max(100, self.speed - self.slowing_rate * delta_time)
-    
+
     def remove_from_sprite_lists(self):
         self.state = RadialBullet.STATE_FREEZE
         super().remove_from_sprite_lists()
@@ -91,9 +95,7 @@ class Bomber(DartingEnemy):
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(
-            Bomber.RADIUS, x, y, stage, Bomber.INIT_HP, interval=interval
-        )
+        super().__init__(Bomber.RADIUS, x, y, stage, Bomber.INIT_HP, interval=interval)
         self.bullet_counts = bullet_counts
         self.bullets_active = []
         self.shooting = False
@@ -154,7 +156,7 @@ class Bomber(DartingEnemy):
                         self.bullets_active = []
                         self.shooting = False
                         self.rand_next()
-        
+
         super().on_update(delta_time)
 
     def on_die(self):
@@ -182,7 +184,7 @@ class Zeppelin(Bomber, Boss):
         )
 
         Boss.__init__(self)
-    
+
     def on_update(self, delta_time: float):
         Bomber.on_update(self, delta_time)
         self.update_hp_bar()

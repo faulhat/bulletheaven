@@ -206,7 +206,7 @@ class Wormwood(SeaStar, Boss):
         )
 
         Boss.__init__(self)
-    
+
     def on_update(self, delta_time: float):
         SeaStar.on_update(self, delta_time)
         self.update_hp_bar()
