@@ -69,6 +69,7 @@ class Player(arcade.SpriteCircle):
         self.fire_clock = 0
         self.serene_clock = 0
         self.blinker_clock = 0
+        self.blinker_counter = 0
         self.blink = False
 
         self.n_continues = 2
@@ -100,18 +101,18 @@ class Player(arcade.SpriteCircle):
             self.exit_serene_denied()
 
     def use_charm(self):
-        if self.n_charms:
-            if not self.serene:
+        if not self.serene:
+            if self.n_charms:
                 self.serene = True
                 self.serene_denied = False
                 self.n_charms -= 1
                 self.serene_label.text = "SERENITY MODE"
                 self.serene_clock = 0
-        else:
-            self.serene_denied = True
-            self.serene_label.text = "NO CHARMS!"
-            self.serene_label.color = arcade.csscolor.BLACK
-            self.serene_clock = 0
+            else:
+                self.serene_denied = True
+                self.serene_label.text = "NO CHARMS!"
+                self.serene_label.color = arcade.csscolor.BLACK
+                self.serene_clock = 0
 
     def exit_serene_mode(self):
         if self.serene:
@@ -182,22 +183,24 @@ class Player(arcade.SpriteCircle):
 
         if self.invincible:
             # Make player sprite blink while invincible
-            blink = int(self.blinker_clock * 5) % 2
-            if blink == 0:
-                self.blink = True
-                self.texture = self.on_hit_texture
-                self.hp_label.color = arcade.csscolor.BLACK
-
-            if blink == 1:
-                self.blink = False
-                self.texture = self.normal_texture
-                self.hp_label.color = arcade.csscolor.WHITE
-
-            if self.blinker_clock > 2:
-                self.blink = False
-                self.invincible = False
-                self.texture = self.normal_texture
-                self.hp_label.color = arcade.csscolor.WHITE
+            if self.blinker_clock > 0.25:
+                self.blinker_clock = 0
+                self.blinker_counter += 1
+                if self.blinker_counter > 8:
+                    self.blinker_counter = 0
+                    self.blink = False
+                    self.invincible = False
+                    self.texture = self.normal_texture
+                    self.hp_label.color = arcade.csscolor.WHITE
+                elif not self.blink:
+                    self.blink = True
+                    self.texture = self.on_hit_texture
+                    self.hp_label.color = arcade.csscolor.BLACK
+                else:
+                    self.blink = False
+                    self.texture = self.normal_texture
+                    self.hp_label.color = arcade.csscolor.WHITE
+                
         else:
             enemy_hits = self.collides_with_list(self.stage.bullets)
             if enemy_hits or self.collides_with_list(self.stage.enemies):

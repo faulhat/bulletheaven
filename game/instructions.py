@@ -39,5 +39,5 @@ class Instructions(InfoScreen):
                 font_name="PressStart2P",
                 anchor_x="center",
             ),
-            L3Stage1(),
+            L1Stage1(),
         )

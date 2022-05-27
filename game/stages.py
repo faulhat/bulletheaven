@@ -278,7 +278,7 @@ class L3Stage1(Stage):
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
-        if self.stage_stopwatch > (WIDTH + 50) / Turret.SPEED:
+        if self.stage_stopwatch > (WIDTH + 50) / Turret.SPEED and self.enemies:
             self.make_turrets()
             self.stage_stopwatch = 0
 
@@ -303,7 +303,7 @@ class L3Stage2(Stage):
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
-        if self.stage_stopwatch > 10:
+        if self.stage_stopwatch > 10 and self.enemies:
             self.make_turrets()
             self.stage_stopwatch = 0
 
@@ -382,22 +382,22 @@ class L3Gauntlet(Stage):
         super().stage_update(delta_time)
 
         if self.mode == 1:
-            if self.stage_stopwatch > 10:
+            if self.stage_stopwatch > 10 and self.enemies:
                 FallingStar(WIDTH * 1/2 + self.direction_switch * 200, self)
                 self.direction_switch *= -1
                 self.stage_stopwatch = 0
         elif self.mode == 2:
-            if self.stage_stopwatch > 10:
+            if self.stage_stopwatch > 10 and self.enemies:
                 Turret(HEIGHT * 3/4, self.direction_switch, self)
                 self.direction_switch *= -1
                 self.stage_stopwatch = 0
         elif self.mode == 5:
-            if self.stage_stopwatch > 10:
+            if self.stage_stopwatch > 10 and self.enemies:
                 FallingStar(WIDTH * 1/4, self)
                 FallingStar(WIDTH * 3/4, self)
                 self.stage_stopwatch = 0
         elif self.mode == 6:
-            if self.stage_stopwatch > 8:
+            if self.stage_stopwatch > 8 and self.enemies:
                 AimingTurret(WIDTH * 2/3, self, self.direction_switch)
                 self.direction_switch *= -1
                 self.stage_stopwatch = 0

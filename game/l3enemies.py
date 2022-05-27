@@ -135,3 +135,10 @@ class FireBomber(DartingEnemy):
                         self.rand_next()
 
         super().on_update(delta_time)
+    
+    def on_die(self):
+        for bullet in self.bullets_active:
+            bullet.go_fire(*self.position)
+        
+        self.bullets_active = []
+        super().on_die()
