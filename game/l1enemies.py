@@ -10,7 +10,7 @@ from constants import *
 
 class BasicBullet(Bullet):
     def __init__(self, x: float, y: float, angle: float, stage: Stage):
-        super().__init__(8, arcade.csscolor.VIOLET, x, y, angle, 400, stage)
+        super().__init__(arcade.csscolor.VIOLET, x, y, angle, 400, stage)
 
 
 class DartingEnemy(Enemy):
@@ -139,7 +139,7 @@ class FallingStar(Enemy):
 
 
 class Turret(Enemy):
-    RADIUS = 12
+    RADIUS = 15
     COLOR = arcade.csscolor.GREENYELLOW
     INIT_HP = 4
     SPEED = 250

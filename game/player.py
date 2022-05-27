@@ -15,7 +15,7 @@ class Stage(arcade.View):
 class FriendlyBullet(Bullet):
     def __init__(self, x: float, y: float, stage: arcade.View):
         super().__init__(
-            8, arcade.csscolor.BLUE, x, y, math.pi * 1 / 2, 600, stage, friendly=True
+            arcade.csscolor.BLUE, x, y, math.pi * 1 / 2, 600, stage, friendly=True
         )
 
 

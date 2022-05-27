@@ -77,7 +77,9 @@ class FireBomber(DartingEnemy):
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP, interval=interval)
+        super().__init__(
+            FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP, interval=interval
+        )
         self.bullet_counts = bullet_counts
         self.shooting = False
         self.bullets_active = []
@@ -135,10 +137,33 @@ class FireBomber(DartingEnemy):
                         self.rand_next()
 
         super().on_update(delta_time)
-    
+
     def on_die(self):
         for bullet in self.bullets_active:
             bullet.go_fire(*self.position)
-        
+
         self.bullets_active = []
         super().on_die()
+
+
+class Wyvern(FireBomber, Boss):
+    COLOR = arcade.csscolor.LIGHT_GREY
+    BOSS_INIT_HP = 50
+    NAME = "Wyvern"
+
+    def __init__(self, stage: Stage):
+        FireBomber.__init__(
+            self,
+            WIDTH / 8,
+            HEIGHT + FireBomber.RADIUS,
+            stage,
+            interval=1.8,
+            bullet_counts=[20, 20, 15, 15, 15],
+            fire_radii=[50, 50, 60, 70, 80],
+        )
+
+        Boss.__init__(self)
+
+    def on_update(self, delta_time: float):
+        FireBomber.on_update(self, delta_time)
+        self.update_hp_bar()

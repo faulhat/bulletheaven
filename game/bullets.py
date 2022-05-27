@@ -11,9 +11,10 @@ class Stage(arcade.View):
 
 
 class Bullet(arcade.SpriteCircle):
+    RADIUS = 8
+
     def __init__(
         self,
-        radius: float,
         color: arcade.Color,
         x: float,
         y: float,
@@ -22,7 +23,7 @@ class Bullet(arcade.SpriteCircle):
         stage: Stage,
         friendly: bool = False,
     ):
-        super().__init__(radius, color)
+        super().__init__(Bullet.RADIUS, color)
         self.set_position(x, y)
         self.angle = angle
         self.speed = speed

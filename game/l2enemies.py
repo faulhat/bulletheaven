@@ -10,7 +10,6 @@ from utils import distance
 
 
 class RadialBullet(Bullet):
-    RADIUS = 8
     STATE_CIRCLE_FORMATION = 0
     STATE_FREEZE = 1
     STATE_FIRE = 2
@@ -33,7 +32,6 @@ class RadialBullet(Bullet):
             slowing_rate = RadialBullet.SLOWING_RATE
 
         super().__init__(
-            RadialBullet.RADIUS,
             arcade.csscolor.VIOLET,
             self.origin_x,
             self.origin_y,
