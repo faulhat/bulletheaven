@@ -136,6 +136,16 @@ class Player(arcade.SpriteCircle):
         )
         super().set_position(x, y)
 
+    def toggle_blinker(self):
+        if not self.blink:
+            self.blink = True
+            self.texture = self.on_hit_texture
+            self.hp_label.color = arcade.csscolor.BLACK
+        else:
+            self.blink = False
+            self.texture = self.normal_texture
+            self.hp_label.color = arcade.csscolor.WHITE
+
     def on_update(self, delta_time: float):
         self.fire_clock += delta_time
         self.serene_clock += delta_time
@@ -183,24 +193,17 @@ class Player(arcade.SpriteCircle):
 
         if self.invincible:
             # Make player sprite blink while invincible
-            if self.blinker_clock > 0.25:
+            if self.blinker_clock > 0.2:
                 self.blinker_clock = 0
                 self.blinker_counter += 1
-                if self.blinker_counter > 8:
+                if self.blinker_counter > 10:
                     self.blinker_counter = 0
                     self.blink = False
                     self.invincible = False
                     self.texture = self.normal_texture
                     self.hp_label.color = arcade.csscolor.WHITE
-                elif not self.blink:
-                    self.blink = True
-                    self.texture = self.on_hit_texture
-                    self.hp_label.color = arcade.csscolor.BLACK
                 else:
-                    self.blink = False
-                    self.texture = self.normal_texture
-                    self.hp_label.color = arcade.csscolor.WHITE
-                
+                    self.toggle_blinker()
         else:
             enemy_hits = self.collides_with_list(self.stage.bullets)
             if enemy_hits or self.collides_with_list(self.stage.enemies):
