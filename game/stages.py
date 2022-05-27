@@ -1,5 +1,6 @@
 import arcade
 
+from enemy import Boss
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Balloon, Zeppelin
 from l3enemies import AimingTurret, FireBomber
@@ -265,24 +266,19 @@ class L3Stage1(Stage):
         self.turret_counter = 0
 
     def make_turrets(self):
-        AimingTurret(HEIGHT * 6 / 8, self, self.direction_switch)
-        AimingTurret(HEIGHT * 7 / 8, self, -self.direction_switch)
+        Turret(HEIGHT * 3/4, self.direction_switch, self)
         self.direction_switch *= -1
-        self.turret_counter += 1
 
     def inc_stage(self):
         self.window.show_view(L3Stage2(self))
 
     def start_stage(self):
         super().start_stage()
-        FireBomber(WIDTH + FireBomber.RADIUS, HEIGHT + FireBomber.RADIUS, self)
+        FireBomber(WIDTH + FireBomber.RADIUS, HEIGHT + FireBomber.RADIUS, self, bullet_counts=[10, 12], interval=2)
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
-        if (
-            self.stage_stopwatch > (WIDTH - 50) / AimingTurret.SPEED
-            and self.turret_counter < 3
-        ):
+        if self.stage_stopwatch > (WIDTH + 50) / Turret.SPEED:
             self.make_turrets()
             self.stage_stopwatch = 0
 
@@ -290,8 +286,36 @@ class L3Stage1(Stage):
 class L3Stage2(Stage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
+        self.transition_label.text = "Level Three - Stage Two"
+        self.direction_switch = LEFT
+    
+    def make_turrets(self):
+        AimingTurret(HEIGHT * 6/8, self, self.direction_switch, n_bullets=3)
+        AimingTurret(HEIGHT * 7/8, self, -self.direction_switch, n_bullets=3)
+        self.direction_switch *= -1
+    
+    def inc_stage(self):
+        self.window.show_view(L3Gauntlet(self))
+    
+    def start_stage(self):
+        super().start_stage()
+        FireBomber(-FireBomber.RADIUS, HEIGHT + FireBomber.RADIUS, self, bullet_counts=[10, 10], interval=1.5)
+
+    def stage_update(self, delta_time: float):
+        super().stage_update(delta_time)
+        if self.stage_stopwatch > 10:
+            self.make_turrets()
+            self.stage_stopwatch = 0
+
+
+class L3Gauntlet(Stage):
+    boss: Boss
+
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
         self.transition_label.text = "Level Three - The Gauntlet"
         self.mode = 0
+        self.direction_switch = LEFT
 
     def inc_stage(self):
         if self.mode > 6:
@@ -350,9 +374,43 @@ class L3Stage2(Stage):
                 WIDTH / 2, HEIGHT + FireBomber.RADIUS, self, bullet_counts=[8, 10]
             )
         elif self.mode == 5:
-            Wormwood(self)
+            self.boss = Wormwood(self)
         elif self.mode == 6:
-            Zeppelin(self)
+            self.boss = Zeppelin(self)
+    
+    def stage_update(self, delta_time: float):
+        super().stage_update(delta_time)
+
+        if self.mode == 1:
+            if self.stage_stopwatch > 10:
+                FallingStar(WIDTH * 1/2 + self.direction_switch * 200, self)
+                self.direction_switch *= -1
+                self.stage_stopwatch = 0
+        elif self.mode == 2:
+            if self.stage_stopwatch > 10:
+                Turret(HEIGHT * 3/4, self.direction_switch, self)
+                self.direction_switch *= -1
+                self.stage_stopwatch = 0
+        elif self.mode == 5:
+            if self.stage_stopwatch > 10:
+                FallingStar(WIDTH * 1/4, self)
+                FallingStar(WIDTH * 3/4, self)
+                self.stage_stopwatch = 0
+        elif self.mode == 6:
+            if self.stage_stopwatch > 8:
+                AimingTurret(WIDTH * 2/3, self, self.direction_switch)
+                self.direction_switch *= -1
+                self.stage_stopwatch = 0
+        
+        if self.mode == 5 or self.mode == 6:
+            if self.boss.hp == 0:
+                self.boss.hp_label.text = "Boss Vanquished!"
+
+    def on_draw(self):
+        super().on_draw()
+
+        if self.mode == 5 or self.mode == 6:
+            self.boss.draw_hp_bar()
 
 
 class ToEnd(Stage):

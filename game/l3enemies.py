@@ -43,7 +43,7 @@ class AimingTurret(Enemy):
                 angle = math.atan2(player_y - y, player_x - x)
                 BasicBullet(x, y + AimingTurret.RADIUS, angle, self.stage)
 
-                if self.counter > self.n_bullets:
+                if self.counter == self.n_bullets:
                     self.counter = 0
                     self.shooting = False
         else:
@@ -65,7 +65,7 @@ class AimingTurret(Enemy):
 
 class FireBomber(DartingEnemy):
     RADIUS = 15
-    INIT_HP = 8
+    INIT_HP = 11
     COLOR = arcade.csscolor.ORANGE
 
     def __init__(
@@ -73,10 +73,11 @@ class FireBomber(DartingEnemy):
         x: float,
         y: float,
         stage: Stage,
+        interval: float = 1,
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP)
+        super().__init__(FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP, interval=interval)
         self.bullet_counts = bullet_counts
         self.shooting = False
         self.bullets_active = []
@@ -93,8 +94,6 @@ class FireBomber(DartingEnemy):
             self.fire_radii = [50 + 10 * i for i in range(self.n_rounds)]
 
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
-
         if not self.shooting:
             if self.stopwatch > self.interval:
                 self.stopwatch = 0
@@ -134,3 +133,5 @@ class FireBomber(DartingEnemy):
                         self.round = 0
                         self.shooting = False
                         self.rand_next()
+
+        super().on_update(delta_time)
