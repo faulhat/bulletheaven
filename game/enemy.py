@@ -106,7 +106,7 @@ class Boss:
 class DartingEnemy(Enemy):
     def rand_next(self):
         self.angle_offset = random() * math.pi * 2
-        self.prev_x, self.prev_y = self.next_x, self.next_y
+        self.prev_x, self.prev_y = self.position
         self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
         self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
 
@@ -125,7 +125,7 @@ class DartingEnemy(Enemy):
         self.stopwatch = 0
         self.interval = interval
         self.shooting = False
-    
+
     def change_state(self):
         self.stopwatch = 0
         self.shooting = not self.shooting

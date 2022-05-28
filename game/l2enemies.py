@@ -1,4 +1,5 @@
 import math
+from random import random
 import arcade
 
 from bullets import Bullet
@@ -184,7 +185,7 @@ class Zeppelin(Balloon, Boss):
         Boss.__init__(self)
         self.fire_circle = True
         self.crossing_direction = LEFT
-    
+
     def change_state(self):
         self.stopwatch = 0
         self.shooting = not self.shooting
@@ -193,23 +194,35 @@ class Zeppelin(Balloon, Boss):
         if not self.shooting:
             self.fire_circle = not self.fire_circle
             if self.fire_circle:
-                self.next_x, self.next_y = self.position
                 self.rand_next()
                 self.counter = 0
             else:
                 if self.crossing_direction == LEFT:
-                    self.angle = math.atan2((HEIGHT - Zeppelin.RADIUS - 50) - y, Zeppelin.RADIUS - x)
+                    self.angle = math.atan2(
+                        (HEIGHT - Zeppelin.RADIUS - 50) - y, Zeppelin.RADIUS - x
+                    )
                 elif self.crossing_direction == RIGHT:
-                    self.angle = math.atan2((HEIGHT - Zeppelin.RADIUS - 50) - y, (WIDTH - Zeppelin.RADIUS) - x)
+                    self.angle = math.atan2(
+                        (HEIGHT - Zeppelin.RADIUS - 50) - y,
+                        (WIDTH - Zeppelin.RADIUS) - x,
+                    )
         else:
             if not self.fire_circle:
                 self.crossing_direction *= -1
                 if self.crossing_direction == LEFT:
-                    self.angle = math.atan2(HEIGHT/2 - y, Zeppelin.RADIUS - x)
+                    self.angle = math.atan2(HEIGHT / 2 - y, Zeppelin.RADIUS - x)
                 elif self.crossing_direction == RIGHT:
-                    self.angle = math.atan2(HEIGHT/2 - y, (WIDTH - Zeppelin.RADIUS) - x)
+                    self.angle = math.atan2(
+                        HEIGHT / 2 - y, (WIDTH - Zeppelin.RADIUS) - x
+                    )
 
     def on_update(self, delta_time: float):
+        if self.shooting:
+            x, y = self.position
+            x += (2 * random() - 1) * delta_time * Zeppelin.SPEED / 3
+            y += (2 * random() - 1) * delta_time * Zeppelin.SPEED / 3
+            self.set_position(x, y)
+
         if self.fire_circle:
             Balloon.on_update(self, delta_time)
         else:
@@ -221,13 +234,13 @@ class Zeppelin(Balloon, Boss):
             if not self.shooting and next_y > HEIGHT - Zeppelin.RADIUS - 50:
                 next_y = HEIGHT - Zeppelin.RADIUS - 50
                 self.change_state()
-            elif self.shooting and next_y < HEIGHT/2:
-                next_y = HEIGHT/2
+            elif self.shooting and next_y < HEIGHT / 2:
+                next_y = HEIGHT / 2
                 self.change_state()
-            
-            x += math.cos(self.angle) * (next_y - y)/math.sin(self.angle)
+
+            x += math.cos(self.angle) * (next_y - y) / math.sin(self.angle)
             self.set_position(x, next_y)
-            if self.shooting and self.stopwatch > 0.25:
+            if self.shooting and self.stopwatch > 0.35:
                 self.stopwatch = 0
                 player_x, player_y = self.stage.player.position
                 bullet_angle = math.atan2(player_y - next_y, player_x - x)

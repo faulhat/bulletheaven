@@ -34,7 +34,7 @@ class SeaStar(DartingEnemy):
         self.interval = interval
         self.n_bullets = n_bullets
         self.double = double
-    
+
     def change_state(self):
         super().change_state()
         self.counter = 0
@@ -184,7 +184,6 @@ class Wormwood(SeaStar, Boss):
         if not self.shooting:
             self.fire_star = not self.fire_star
             if self.fire_star:
-                self.next_x, self.next_y = self.position
                 self.rand_next()
                 self.counter = 0
         else:
@@ -192,6 +191,12 @@ class Wormwood(SeaStar, Boss):
                 self.crossing_direction *= -1
 
     def on_update(self, delta_time: float):
+        if self.shooting:
+            x, y = self.position
+            x += (2 * random() - 1) * delta_time * Wormwood.SPEED / 4
+            y += (2 * random() - 1) * delta_time * Wormwood.SPEED / 4
+            self.set_position(x, y)
+
         if self.fire_star:
             SeaStar.on_update(self, delta_time)
         else:
@@ -206,10 +211,15 @@ class Wormwood(SeaStar, Boss):
             elif self.crossing_direction == RIGHT and x >= WIDTH - Wormwood.RADIUS:
                 x = WIDTH - Wormwood.RADIUS
                 self.change_state()
-                
+
             self.set_position(x, y)
-            if self.shooting and self.stopwatch > 0.2:
+            if self.shooting and self.stopwatch > 0.35:
                 self.stopwatch = 0
-                BasicBullet(self.position[0], y - Wormwood.RADIUS - BasicBullet.RADIUS, math.pi * 3/2, self.stage)
+                BasicBullet(
+                    self.position[0],
+                    y - Wormwood.RADIUS - BasicBullet.RADIUS,
+                    math.pi * 3 / 2,
+                    self.stage,
+                )
 
         self.update_hp_bar()

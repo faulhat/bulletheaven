@@ -95,11 +95,14 @@ class FireBomber(DartingEnemy):
         else:
             self.fire_radii = [50 + 10 * i for i in range(self.n_rounds)]
 
+    def change_state(self):
+        super().change_state()
+        self.round = 0
+
     def on_update(self, delta_time: float):
         if not self.shooting:
             if self.stopwatch > self.interval:
-                self.stopwatch = 0
-                self.shooting = True
+                self.change_state()
             else:
                 self.dart_update()
         else:
@@ -131,10 +134,7 @@ class FireBomber(DartingEnemy):
                     self.bullets_active = []
                     self.round += 1
                     if self.round == self.n_rounds:
-                        self.stopwatch = 0
-                        self.round = 0
-                        self.shooting = False
-                        self.rand_next()
+                        self.change_state()
 
         super().on_update(delta_time)
 
@@ -148,8 +148,9 @@ class FireBomber(DartingEnemy):
 
 class Wyvern(FireBomber, Boss):
     COLOR = arcade.csscolor.LIGHT_GREY
-    BOSS_INIT_HP = 50
+    BOSS_INIT_HP = 55
     NAME = "Wyvern"
+    SPEED = 100
 
     def __init__(self, stage: Stage):
         FireBomber.__init__(
@@ -157,13 +158,52 @@ class Wyvern(FireBomber, Boss):
             WIDTH / 8,
             HEIGHT + FireBomber.RADIUS,
             stage,
-            interval=1.8,
+            interval=1.2,
             bullet_counts=[20, 20, 15, 15, 15],
             fire_radii=[50, 50, 60, 70, 80],
         )
 
         Boss.__init__(self)
+        self.fire_bomb = False
+        self.counter = 0
+
+    def change_state(self):
+        if self.shooting and not self.fire_bomb:
+            self.fire_bomb = True
+            self.counter = 0
+        else:
+            super().change_state()
+            self.fire_bomb = False
 
     def on_update(self, delta_time: float):
-        FireBomber.on_update(self, delta_time)
+        if self.shooting:
+            x, y = self.position
+            x += (2 * random() - 1) * delta_time * Wyvern.SPEED
+            y += (2 * random() - 1) * delta_time * Wyvern.SPEED
+            self.set_position(x, y)
+
+        if self.fire_bomb or not self.shooting:
+            FireBomber.on_update(self, delta_time)
+        else:
+            Enemy.on_update(self, delta_time)
+            self.stopwatch += delta_time
+
+            if self.stopwatch > 0.2:
+                self.stopwatch = 0
+                self.counter += 1
+                angle = random() * math.pi * 2
+                x, y = self.position
+                for _ in range(7):
+                    bullet_x = x + math.cos(angle) * (
+                        FireBomber.RADIUS + BasicBullet.RADIUS
+                    )
+                    bullet_y = y + math.sin(angle) * (
+                        FireBomber.RADIUS + BasicBullet.RADIUS
+                    )
+                    BasicBullet(bullet_x, bullet_y, angle, self.stage)
+                    angle += math.pi * 2 / 5
+
+                if self.counter == 9:
+                    self.change_state()
+
         self.update_hp_bar()
