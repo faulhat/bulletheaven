@@ -96,7 +96,6 @@ class Balloon(DartingEnemy):
         )
         self.bullet_counts = bullet_counts
         self.bullets_active = []
-        self.shooting = False
         self.angle = 0
         if bullet_counts:
             self.bullet_counts = bullet_counts
@@ -116,8 +115,7 @@ class Balloon(DartingEnemy):
     def on_update(self, delta_time: float):
         if not self.shooting:
             if self.stopwatch > self.interval:
-                self.stopwatch = 0
-                self.shooting = True
+                self.change_state()
             else:
                 self.dart_update()
         else:
@@ -152,8 +150,7 @@ class Balloon(DartingEnemy):
                         self.waiting_on_round = 0
                         self.counter_in_round = 0
                         self.bullets_active = []
-                        self.shooting = False
-                        self.rand_next()
+                        self.change_state()
 
         super().on_update(delta_time)
 

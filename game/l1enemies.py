@@ -2,7 +2,7 @@ import math
 from random import random
 import arcade
 
-from enemy import Enemy, Boss
+from enemy import Enemy, Boss, DartingEnemy
 from bullets import Bullet
 from stage import Stage
 from constants import *
@@ -11,38 +11,6 @@ from constants import *
 class BasicBullet(Bullet):
     def __init__(self, x: float, y: float, angle: float, stage: Stage):
         super().__init__(arcade.csscolor.VIOLET, x, y, angle, 400, stage)
-
-
-class DartingEnemy(Enemy):
-    def rand_next(self):
-        self.angle_offset = random() * math.pi * 2
-        self.prev_x, self.prev_y = self.next_x, self.next_y
-        self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
-        self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
-
-    def __init__(
-        self,
-        radius: float,
-        x: float,
-        y: float,
-        stage: Stage,
-        init_hp: int,
-        interval: float = 1,
-    ):
-        super().__init__(radius, x, y, stage, init_hp)
-        self.next_x, self.next_y = self.position
-        self.rand_next()
-        self.stopwatch = 0
-        self.interval = interval
-
-    def dart_update(self):
-        x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch / self.interval
-        y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch / self.interval
-        self.set_position(x, y)
-
-    def on_update(self, delta_time: float):
-        self.stopwatch += delta_time
-        super().on_update(delta_time)
 
 
 class SeaStar(DartingEnemy):
@@ -61,21 +29,22 @@ class SeaStar(DartingEnemy):
     ):
         super().__init__(SeaStar.RADIUS, x, y, stage, 12, interval=interval)
         self.counter = 0
-        self.shooting = False
         self.angle_offset = 0
         self.n_spines = n_spines
         self.interval = interval
         self.n_bullets = n_bullets
         self.double = double
+    
+    def change_state(self):
+        super().change_state()
+        self.counter = 0
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
 
         if not self.shooting:
             if self.stopwatch > self.interval:
-                self.stopwatch = 0
-                self.counter = 0
-                self.shooting = True
+                self.change_state()
             else:
                 self.dart_update()
         else:
@@ -85,8 +54,7 @@ class SeaStar(DartingEnemy):
                 if (not self.double and self.counter > self.n_bullets) or (
                     self.double and self.counter > self.n_bullets * 2
                 ):
-                    self.shooting = False
-                    self.rand_next()
+                    self.change_state()
                 else:
                     for i in range(self.n_spines):
                         angle = self.angle_offset + math.pi * 2 / self.n_spines * i
@@ -193,6 +161,7 @@ class Wormwood(SeaStar, Boss):
     BOSS_INIT_HP = 40
     COLOR = arcade.csscolor.BEIGE
     NAME = "Wormwood"
+    SPEED = 400
 
     def __init__(self, stage: Stage):
         SeaStar.__init__(
@@ -206,7 +175,42 @@ class Wormwood(SeaStar, Boss):
         )
 
         Boss.__init__(self)
+        self.fire_star = True
+        self.crossing_direction = LEFT
+        self.turret_fire_counter = 0
+
+    def change_state(self):
+        self.stopwatch = 0
+        self.shooting = not self.shooting
+        if not self.shooting:
+            self.fire_star = not self.fire_star
+            if self.fire_star:
+                self.next_x, self.next_y = self.position
+                self.rand_next()
+                self.counter = 0
+        else:
+            if not self.fire_star:
+                self.crossing_direction *= -1
 
     def on_update(self, delta_time: float):
-        SeaStar.on_update(self, delta_time)
+        if self.fire_star:
+            SeaStar.on_update(self, delta_time)
+        else:
+            Enemy.on_update(self, delta_time)
+            self.stopwatch += delta_time
+
+            x, y = self.position
+            x += Wormwood.SPEED * delta_time * self.crossing_direction
+            if self.crossing_direction == LEFT and x <= Wormwood.RADIUS:
+                x = Wormwood.RADIUS
+                self.change_state()
+            elif self.crossing_direction == RIGHT and x >= WIDTH - Wormwood.RADIUS:
+                x = WIDTH - Wormwood.RADIUS
+                self.change_state()
+                
+            self.set_position(x, y)
+            if self.shooting and self.stopwatch > 0.2:
+                self.stopwatch = 0
+                BasicBullet(self.position[0], y - Wormwood.RADIUS - BasicBullet.RADIUS, math.pi * 3/2, self.stage)
+
         self.update_hp_bar()

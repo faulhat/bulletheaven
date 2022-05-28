@@ -1,4 +1,5 @@
 from abc import abstractproperty
+import math
 from random import random
 import arcade
 
@@ -44,10 +45,9 @@ class Enemy(arcade.SpriteCircle):
 
     def on_update(self, delta_time: float):
         self.hit_wait_clock += delta_time
-        if self.hit:
-            if self.hit_wait_clock > 0.1:
-                self.hit = False
-                self.texture = self.normal_texture
+        if self.hit and self.hit_wait_clock > 0.1:
+            self.hit = False
+            self.texture = self.normal_texture
 
         hits = self.collides_with_list(self.stage.friendly)
         if hits:
@@ -101,3 +101,42 @@ class Boss:
 
     def update_hp_bar(self):
         self.hp_label.text = f"{self.NAME}'s HP: {self.hp}"
+
+
+class DartingEnemy(Enemy):
+    def rand_next(self):
+        self.angle_offset = random() * math.pi * 2
+        self.prev_x, self.prev_y = self.next_x, self.next_y
+        self.next_x = random() * (WIDTH - 2 * self.width / 2) + self.width / 2
+        self.next_y = (random() * 1 / 2 + 1 / 2) * (HEIGHT - 2 * self.width / 2)
+
+    def __init__(
+        self,
+        radius: float,
+        x: float,
+        y: float,
+        stage: Stage,
+        init_hp: int,
+        interval: float = 1,
+    ):
+        super().__init__(radius, x, y, stage, init_hp)
+        self.next_x, self.next_y = self.position
+        self.rand_next()
+        self.stopwatch = 0
+        self.interval = interval
+        self.shooting = False
+    
+    def change_state(self):
+        self.stopwatch = 0
+        self.shooting = not self.shooting
+        if not self.shooting:
+            self.rand_next()
+
+    def dart_update(self):
+        x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch / self.interval
+        y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch / self.interval
+        self.set_position(x, y)
+
+    def on_update(self, delta_time: float):
+        self.stopwatch += delta_time
+        super().on_update(delta_time)
