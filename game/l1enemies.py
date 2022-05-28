@@ -177,7 +177,6 @@ class Wormwood(SeaStar, Boss):
         Boss.__init__(self)
         self.fire_star = True
         self.crossing_direction = LEFT
-        self.turret_fire_counter = 0
 
     def change_state(self):
         self.stopwatch = 0
