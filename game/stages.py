@@ -52,8 +52,7 @@ class L1Stage2(Stage):
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
-        if self.stage_stopwatch > 7:
-            self.stage_stopwatch = 0
+        if self.stage_stopwatch.check_reset(7):
             self.make_dual_wielder()
 
 
@@ -63,7 +62,7 @@ class L1Stage3(Stage):
         self.transition_label.text = "Level One - Stage Three"
         self.sea_stars = arcade.SpriteList()
         self.dual_wielders = arcade.SpriteList()
-        self.new_enemy_clock = 0
+        self.new_enemy_clock = self.new_stopwatch()
         self.new_enemy_wait = False
         self.counter = 0
 
@@ -86,9 +85,7 @@ class L1Stage3(Stage):
         self.make_dual_wielders()
 
     def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-        if self.stage_stopwatch > 15:
-            self.stage_stopwatch = 0
+        if self.stage_stopwatch.check_reset(15):
             if len(self.sea_stars) == 1 and self.counter < 2:
                 self.counter += 1
                 self.sea_stars.append(
@@ -100,12 +97,11 @@ class L1Stage3(Stage):
                     )
                 )
 
-        self.new_enemy_clock += delta_time
         if len(self.dual_wielders) == 0:
             if not self.new_enemy_wait:
                 self.new_enemy_wait = True
-                self.new_enemy_clock = 0
-            elif self.new_enemy_clock > 2:
+                self.new_enemy_clock.reset()
+            elif self.new_enemy_clock.check(2):
                 self.new_enemy_wait = False
                 self.make_dual_wielders()
 
@@ -151,14 +147,12 @@ class L1Stage4(Stage):
         self.make_turrets()
 
     def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-
         if len(self.turrets) == 0:
             if not self.turrets_wait:
                 self.turrets_wait = True
                 self.counter += 1
-                self.stage_stopwatch = 0
-            elif self.stage_stopwatch > 3:
+                self.stage_stopwatch.reset()
+            elif self.stage_stopwatch.check(3):
                 self.turrets_wait = False
                 self.make_turrets()
 
@@ -180,7 +174,7 @@ class L2Stage1(Stage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Level Two - Stage One"
-        self.intro_new_enemy_watch = 0
+        self.intro_new_enemy_watch = self.new_stopwatch()
         self.new_enemy_introduced = False
 
     def inc_stage(self):
@@ -193,9 +187,7 @@ class L2Stage1(Stage):
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
         if not self.new_enemy_introduced:
-            self.intro_new_enemy_watch += delta_time
-
-            if self.intro_new_enemy_watch > 1:
+            if self.intro_new_enemy_watch.check(1):
                 Balloon(WIDTH * 2 / 3, HEIGHT + Balloon.RADIUS, self)
                 self.new_enemy_introduced = True
 
@@ -283,10 +275,10 @@ class L3Stage1(Stage):
         )
 
     def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-        if self.stage_stopwatch > (WIDTH + 50) / Turret.SPEED and self.enemies:
+        if self.enemies and self.stage_stopwatch.check_reset(
+            (WIDTH + 50) / Turret.SPEED
+        ):
             self.make_turrets()
-            self.stage_stopwatch = 0
 
 
 class L3Stage2(Stage):
@@ -314,10 +306,8 @@ class L3Stage2(Stage):
         )
 
     def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-        if self.stage_stopwatch > 7 and self.enemies:
+        if self.enemies and self.stage_stopwatch.check_reset(7):
             self.make_turrets()
-            self.stage_stopwatch = 0
 
 
 class L3Gauntlet(Stage):
@@ -394,28 +384,23 @@ class L3Gauntlet(Stage):
             self.boss = Zeppelin(self)
 
     def stage_update(self, delta_time: float):
-        super().stage_update(delta_time)
-
-        if self.mode == 1:
-            if self.stage_stopwatch > 10 and self.enemies:
-                FallingStar(WIDTH * 1 / 2 + self.direction_switch * 200, self)
-                self.direction_switch *= -1
-                self.stage_stopwatch = 0
-        elif self.mode == 2:
-            if self.stage_stopwatch > 10 and self.enemies:
-                Turret(HEIGHT * 3 / 4, self.direction_switch, self)
-                self.direction_switch *= -1
-                self.stage_stopwatch = 0
-        elif self.mode == 5:
-            if self.stage_stopwatch > 10 and self.enemies:
-                FallingStar(WIDTH * 1 / 4, self)
-                FallingStar(WIDTH * 3 / 4, self)
-                self.stage_stopwatch = 0
-        elif self.mode == 6:
-            if self.stage_stopwatch > 8 and self.enemies:
-                AimingTurret(WIDTH * 2 / 3, self, self.direction_switch)
-                self.direction_switch *= -1
-                self.stage_stopwatch = 0
+        if self.enemies:
+            if self.mode == 1:
+                if self.stage_stopwatch.check_reset(10):
+                    FallingStar(WIDTH * 1 / 2 + self.direction_switch * 200, self)
+                    self.direction_switch *= -1
+            elif self.mode == 2:
+                if self.stage_stopwatch.check_reset(10):
+                    Turret(HEIGHT * 3 / 4, self.direction_switch, self)
+                    self.direction_switch *= -1
+            elif self.mode == 5:
+                if self.stage_stopwatch.check_reset(10):
+                    FallingStar(WIDTH * 1 / 4, self)
+                    FallingStar(WIDTH * 3 / 4, self)
+            elif self.mode == 6:
+                if self.stage_stopwatch.check_reset(8):
+                    AimingTurret(WIDTH * 2 / 3, self, self.direction_switch)
+                    self.direction_switch *= -1
 
         if self.mode == 5 or self.mode == 6:
             if self.boss.hp == 0:

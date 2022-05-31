@@ -5,13 +5,14 @@ import arcade
 
 from constants import *
 from charm import Charm
+from stopwatch import GameObject
 
 
 class Stage(arcade.View):
     enemies: arcade.SpriteList
 
 
-class Enemy(arcade.SpriteCircle):
+class Enemy(arcade.SpriteCircle, GameObject):
     COLOR: arcade.Color
 
     def __init__(
@@ -23,7 +24,9 @@ class Enemy(arcade.SpriteCircle):
         init_hp: int,
         drop_chance: float = 0.2,
     ):
-        super().__init__(radius, self.COLOR)
+        arcade.SpriteCircle.__init__(self, radius, self.COLOR)
+        GameObject.__init__(self)
+
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
             radius * 2, arcade.csscolor.RED
@@ -34,18 +37,19 @@ class Enemy(arcade.SpriteCircle):
         self.stage = stage
         self.hp = init_hp
         self.hit = False
-        self.hit_wait_clock = 0
+        self.hit_wait_clock = self.new_stopwatch()
         self.hit_counter = 0
         self.drop_chance = drop_chance
 
     def on_hit(self):
-        self.hit_wait_clock = 0
+        self.hit_wait_clock.reset()
         self.hit = True
         self.texture = self.on_hit_texture
 
     def on_update(self, delta_time: float):
-        self.hit_wait_clock += delta_time
-        if self.hit and self.hit_wait_clock > 0.1:
+        self.add_all(delta_time)
+
+        if self.hit and self.hit_wait_clock.check(0.1):
             self.hit = False
             self.texture = self.normal_texture
 
@@ -122,21 +126,23 @@ class DartingEnemy(Enemy):
         super().__init__(radius, x, y, stage, init_hp)
         self.next_x, self.next_y = self.position
         self.rand_next()
-        self.stopwatch = 0
+        self.dart_clock = self.new_stopwatch()
         self.interval = interval
         self.shooting = False
 
     def change_state(self):
-        self.stopwatch = 0
+        self.dart_clock.reset()
         self.shooting = not self.shooting
         if not self.shooting:
             self.rand_next()
 
     def dart_update(self):
-        x = self.prev_x + (self.next_x - self.prev_x) * self.stopwatch / self.interval
-        y = self.prev_y + (self.next_y - self.prev_y) * self.stopwatch / self.interval
+        x = (
+            self.prev_x
+            + (self.next_x - self.prev_x) * self.dart_clock.time / self.interval
+        )
+        y = (
+            self.prev_y
+            + (self.next_y - self.prev_y) * self.dart_clock.time / self.interval
+        )
         self.set_position(x, y)
-
-    def on_update(self, delta_time: float):
-        self.stopwatch += delta_time
-        super().on_update(delta_time)

@@ -23,7 +23,7 @@ class AimingTurret(Enemy):
             x = -AimingTurret.RADIUS
 
         super().__init__(AimingTurret.RADIUS, x, y, stage, AimingTurret.INIT_HP)
-        self.fire_watch = 0
+        self.fire_clock = self.new_stopwatch()
         self.counter = 0
         self.shooting = False
         self.n_bullets = n_bullets
@@ -31,12 +31,10 @@ class AimingTurret(Enemy):
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
-        self.fire_watch += delta_time
 
         x, y = self.position
         if self.shooting:
-            if self.fire_watch > 0.2:
-                self.fire_watch = 0
+            if self.fire_clock.check_reset(0.2):
                 self.counter += 1
 
                 player_x, player_y = self.stage.player.position
@@ -46,10 +44,8 @@ class AimingTurret(Enemy):
                 if self.counter == self.n_bullets:
                     self.counter = 0
                     self.shooting = False
-        else:
-            if self.fire_watch > 0.5:
-                self.fire_watch = 0
-                self.shooting = True
+        elif self.fire_clock.check_reset(0.5):
+            self.shooting = True
 
         if self.direction == LEFT:
             x -= AimingTurret.SPEED * delta_time
@@ -101,7 +97,7 @@ class FireBomber(DartingEnemy):
 
     def on_update(self, delta_time: float):
         if not self.shooting:
-            if self.stopwatch > self.interval:
+            if self.dart_clock.check(self.interval):
                 self.change_state()
             else:
                 self.dart_update()
@@ -166,11 +162,13 @@ class Wyvern(FireBomber, Boss):
         Boss.__init__(self)
         self.fire_bomb = False
         self.counter = 0
+        self.fire_clock = self.new_stopwatch()
 
     def change_state(self):
         if self.shooting and not self.fire_bomb:
             self.fire_bomb = True
             self.counter = 0
+            self.fire_clock.reset()
         else:
             super().change_state()
             self.fire_bomb = False
@@ -186,10 +184,8 @@ class Wyvern(FireBomber, Boss):
             FireBomber.on_update(self, delta_time)
         else:
             Enemy.on_update(self, delta_time)
-            self.stopwatch += delta_time
 
-            if self.stopwatch > 0.2:
-                self.stopwatch = 0
+            if self.fire_clock.check_reset(0.2):
                 self.counter += 1
                 angle = random() * math.pi * 2
                 x, y = self.position

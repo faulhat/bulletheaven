@@ -112,16 +112,18 @@ class Balloon(DartingEnemy):
         self.round = 0
         self.counter_in_round = 0
         self.waiting_on_round = 0
+        self.fire_clock = self.new_stopwatch()
 
     def on_update(self, delta_time: float):
         if not self.shooting:
-            if self.stopwatch > self.interval:
+            if self.dart_clock.check(self.interval):
                 self.change_state()
             else:
                 self.dart_update()
         else:
-            if self.stopwatch > self.interval / self.bullet_counts[self.round]:
-                self.stopwatch = 0
+            if self.fire_clock.check_reset(
+                self.interval / self.bullet_counts[self.round]
+            ):
                 if self.counter_in_round == self.bullet_counts[self.round]:
                     if self.round < self.n_rounds - 1:
                         self.counter_in_round = 0
@@ -187,7 +189,7 @@ class Zeppelin(Balloon, Boss):
         self.crossing_direction = LEFT
 
     def change_state(self):
-        self.stopwatch = 0
+        self.reset_all()
         self.shooting = not self.shooting
 
         x, y = self.position
@@ -227,7 +229,6 @@ class Zeppelin(Balloon, Boss):
             Balloon.on_update(self, delta_time)
         else:
             Enemy.on_update(self, delta_time)
-            self.stopwatch += delta_time
 
             x, y = self.position
             next_y = y + math.sin(self.angle) * delta_time * Zeppelin.SPEED
@@ -240,8 +241,7 @@ class Zeppelin(Balloon, Boss):
 
             x += math.cos(self.angle) * (next_y - y) / math.sin(self.angle)
             self.set_position(x, next_y)
-            if self.shooting and self.stopwatch > 0.35:
-                self.stopwatch = 0
+            if self.shooting and self.fire_clock.check_reset(0.35):
                 player_x, player_y = self.stage.player.position
                 bullet_angle = math.atan2(player_y - next_y, player_x - x)
                 BasicBullet(x, next_y, bullet_angle, self.stage)

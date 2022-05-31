@@ -43,13 +43,12 @@ class SeaStar(DartingEnemy):
         super().on_update(delta_time)
 
         if not self.shooting:
-            if self.stopwatch > self.interval:
+            if self.dart_clock.check(self.interval):
                 self.change_state()
             else:
                 self.dart_update()
         else:
-            if self.stopwatch > self.interval / self.n_bullets:
-                self.stopwatch = 0
+            if self.dart_clock.check_reset(self.interval / self.n_bullets):
                 self.counter += 1
                 if (not self.double and self.counter > self.n_bullets) or (
                     self.double and self.counter > self.n_bullets * 2
@@ -79,7 +78,7 @@ class FallingStar(Enemy):
         super().__init__(15, x, HEIGHT + 10, stage, init_hp=FallingStar.INIT_HP)
         self.target_x = WIDTH - x
         self.target_y = -10
-        self.stopwatch = 0
+        self.fire_clock = self.new_stopwatch()
 
         if self.target_x - x == 0:
             # Avoid division by zero.
@@ -94,9 +93,7 @@ class FallingStar(Enemy):
             self.remove_from_sprite_lists()
             return
 
-        self.stopwatch += delta_time
-        if self.stopwatch > 0.5:
-            self.stopwatch = 0
+        if self.fire_clock.check_reset(0.5):
             opp_angle = -self.angle + math.pi
             x = self.position[0] + math.cos(opp_angle)
             BasicBullet(x, self.position[1], opp_angle, self.stage)
@@ -128,9 +125,8 @@ class Turret(Enemy):
         self.set_position(x, y)
         self.speed = Turret.SPEED
 
-        # Direction should be -1 for left and 1 for right
         self.direction = direction
-        self.stopwatch = 0
+        self.fire_clock = self.new_stopwatch()
 
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
@@ -146,9 +142,7 @@ class Turret(Enemy):
             x += self.speed * delta_time * self.direction
             self.set_position(x, y)
 
-        self.stopwatch += delta_time
-        if self.stopwatch > 0.3:
-            self.stopwatch = 0
+        if self.fire_clock.check_reset(0.3):
             BasicBullet(
                 x,
                 y - self.width / 2,
@@ -177,9 +171,10 @@ class Wormwood(SeaStar, Boss):
         Boss.__init__(self)
         self.fire_star = True
         self.crossing_direction = LEFT
+        self.turret_fire_clock = self.new_stopwatch()
 
     def change_state(self):
-        self.stopwatch = 0
+        self.reset_all()
         self.shooting = not self.shooting
         if not self.shooting:
             self.fire_star = not self.fire_star
@@ -201,7 +196,6 @@ class Wormwood(SeaStar, Boss):
             SeaStar.on_update(self, delta_time)
         else:
             Enemy.on_update(self, delta_time)
-            self.stopwatch += delta_time
 
             x, y = self.position
             x += Wormwood.SPEED * delta_time * self.crossing_direction
@@ -213,8 +207,7 @@ class Wormwood(SeaStar, Boss):
                 self.change_state()
 
             self.set_position(x, y)
-            if self.shooting and self.stopwatch > 0.35:
-                self.stopwatch = 0
+            if self.shooting and self.turret_fire_clock.check_reset(0.35):
                 BasicBullet(
                     self.position[0],
                     y - Wormwood.RADIUS - BasicBullet.RADIUS,

@@ -2,15 +2,17 @@ from abc import abstractmethod
 import arcade
 
 from contmenu import ContinueMenu
+from stopwatch import GameObject
 from gameover import GameOver
 from pausemenu import PauseMenu
 from player import Player
 from constants import *
 
 
-class Stage(arcade.View):
+class Stage(arcade.View, GameObject):
     def __init__(self, other: "Stage" = None):
-        super().__init__()
+        GameObject.__init__(self)
+        arcade.View.__init__(self)
         if not other:
             self.player = Player(
                 WIDTH / 2,
@@ -40,8 +42,8 @@ class Stage(arcade.View):
             self.player.stage = self
             self.player.exit_serene_mode()
 
-        self.stopwatch = 0
-        self.stage_stopwatch = 0
+        self.stopwatch = self.new_stopwatch()
+        self.stage_stopwatch = self.new_stopwatch()
         self.transition_label = arcade.Text(
             "",
             WIDTH / 2,
@@ -60,11 +62,10 @@ class Stage(arcade.View):
     @abstractmethod
     def start_stage(self):
         self.in_transition = False
-        self.stage_stopwatch = 0
 
     @abstractmethod
     def stage_update(self, delta_time: float):
-        self.stage_stopwatch += delta_time
+        pass
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.X:
@@ -82,12 +83,13 @@ class Stage(arcade.View):
         return super().on_key_release(_symbol, _modifiers)
 
     def on_update(self, delta_time: float):
+        self.add_all(delta_time)
+
         if self.player.serene:
             delta_time *= 1 / 2
 
-        self.stopwatch += delta_time
         if self.player.dead:
-            if self.stopwatch > 0.5:
+            if self.stopwatch.check(0.5):
                 if self.player.n_continues == 0:
                     self.window.show_view(GameOver())
                 else:
@@ -96,7 +98,7 @@ class Stage(arcade.View):
 
             return
         elif self.in_transition:
-            if self.stopwatch > 2:
+            if self.stopwatch.check_reset(2):
                 self.start_stage()
         elif not (self.enemies or self.bullets or self.charms):
             self.inc_stage()

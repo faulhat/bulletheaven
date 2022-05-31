@@ -2,6 +2,7 @@ import math
 import arcade
 
 from constants import *
+from stopwatch import GameObject
 
 
 # Forward declaration to prevent circular import
@@ -10,7 +11,7 @@ class Stage(arcade.View):
     bullets: arcade.SpriteList
 
 
-class Bullet(arcade.SpriteCircle):
+class Bullet(arcade.SpriteCircle, GameObject):
     RADIUS = 8
 
     def __init__(
@@ -23,7 +24,9 @@ class Bullet(arcade.SpriteCircle):
         stage: Stage,
         friendly: bool = False,
     ):
-        super().__init__(Bullet.RADIUS, color)
+        arcade.SpriteCircle.__init__(self, Bullet.RADIUS, color)
+        GameObject.__init__(self)
+
         self.set_position(x, y)
         self.angle = angle
         self.speed = speed

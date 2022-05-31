@@ -3,6 +3,7 @@ import arcade
 
 from bullets import Bullet
 from constants import *
+from stopwatch import GameObject
 
 
 class Stage(arcade.View):
@@ -19,13 +20,15 @@ class FriendlyBullet(Bullet):
         )
 
 
-class Player(arcade.SpriteCircle):
+class Player(arcade.SpriteCircle, GameObject):
     RADIUS = 12
     SPEED = 350
     INIT_HP = 10
 
     def __init__(self, init_x: float, init_y: float, stage: arcade.View):
-        super().__init__(Player.RADIUS, arcade.csscolor.WHITE)
+        arcade.SpriteCircle.__init__(self, Player.RADIUS, arcade.csscolor.WHITE)
+        GameObject.__init__(self)
+
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
             Player.RADIUS * 2, arcade.csscolor.RED
@@ -66,9 +69,9 @@ class Player(arcade.SpriteCircle):
 
         self.dead = False
         self.slow = False
-        self.fire_clock = 0
-        self.serene_clock = 0
-        self.blinker_clock = 0
+        self.fire_clock = self.new_stopwatch()
+        self.serene_clock = self.new_stopwatch()
+        self.blinker_clock = self.new_stopwatch()
         self.blinker_counter = 0
         self.blink = False
 
@@ -101,18 +104,17 @@ class Player(arcade.SpriteCircle):
             self.exit_serene_denied()
 
     def use_charm(self):
+        self.serene_clock.reset()
         if not self.serene:
             if self.n_charms:
                 self.serene = True
                 self.serene_denied = False
                 self.n_charms -= 1
                 self.serene_label.text = "SERENITY MODE"
-                self.serene_clock = 0
             else:
                 self.serene_denied = True
                 self.serene_label.text = "NO CHARMS!"
                 self.serene_label.color = arcade.csscolor.BLACK
-                self.serene_clock = 0
 
     def exit_serene_mode(self):
         if self.serene:
@@ -147,9 +149,7 @@ class Player(arcade.SpriteCircle):
             self.hp_label.color = arcade.csscolor.WHITE
 
     def on_update(self, delta_time: float):
-        self.fire_clock += delta_time
-        self.serene_clock += delta_time
-        self.blinker_clock += delta_time
+        self.add_all(delta_time)
 
         true_speed = Player.SPEED
         if arcade.key.Z in self.stage.keys:
@@ -193,8 +193,7 @@ class Player(arcade.SpriteCircle):
 
         if self.invincible:
             # Make player sprite blink while invincible
-            if self.blinker_clock > 0.2:
-                self.blinker_clock = 0
+            if self.blinker_clock.check_reset(0.2):
                 self.blinker_counter += 1
                 if self.blinker_counter > 10:
                     self.blinker_counter = 0
@@ -217,7 +216,7 @@ class Player(arcade.SpriteCircle):
                     bullet.remove_from_sprite_lists()
 
                 self.invincible = True
-                self.blinker_clock = 0
+                self.blinker_clock.reset()
 
         charms_caught = self.collides_with_list(self.stage.charms)
         for charm in charms_caught:
@@ -225,15 +224,14 @@ class Player(arcade.SpriteCircle):
             self.inc_charms()
 
         # The player fires a steady stream of bullets
-        if self.fire_clock > 0.1:
+        if self.fire_clock.check_reset(0.1):
             FriendlyBullet(
                 self.position[0],
                 self.position[1] + 20,
                 self.stage,
             )
-            self.fire_clock = 0
 
-        if self.serene_clock > 7 and self.serene:
+        if self.serene_clock.check(7) and self.serene:
             self.exit_serene_mode()
-        elif self.serene_clock > 1 and self.serene_denied:
+        elif self.serene_clock.check(1) and self.serene_denied:
             self.exit_serene_denied()

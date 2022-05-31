@@ -1,12 +1,13 @@
 import os
 import arcade
 
+from stopwatch import GameObject
 from menus import MenuItem, MenuItems, Menu
 from instructions import Instructions
 from constants import *
 
 
-class MainMenu(Menu):
+class MainMenu(Menu, GameObject):
     # Directory containing animation frames
     TITLE_FRAMES_DIR = os.path.join("assets", "title")
 
@@ -21,8 +22,10 @@ class MainMenu(Menu):
     INTERVAL = 0.5
 
     def __init__(self):
-        super().__init__()
-        self.counter = 0
+        Menu.__init__(self)
+        GameObject.__init__(self)
+
+        self.animation_clock = self.new_stopwatch()
         self.frame = 0
         self.title_frames = [
             arcade.load_texture(os.path.join(MainMenu.TITLE_FRAMES_DIR, frame_file))
@@ -57,9 +60,8 @@ class MainMenu(Menu):
         )
 
     def on_update(self, delta_time: float):
-        self.counter += delta_time
-        if self.counter >= MainMenu.INTERVAL:
-            self.counter = 0
+        self.animation_clock.add(delta_time)
+        if self.animation_clock.check_reset(MainMenu.INTERVAL):
             self.frame = (self.frame + 1) % len(self.title_frames)
 
     def on_draw(self):

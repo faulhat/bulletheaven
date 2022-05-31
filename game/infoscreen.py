@@ -1,19 +1,22 @@
 import arcade
 
+from stopwatch import GameObject
 
-class InfoScreen(arcade.View):
+
+class InfoScreen(arcade.View, GameObject):
     def __init__(
         self,
         labels: list[arcade.Text],
         press_enter: arcade.Text,
         next_view: arcade.View,
     ):
-        super().__init__()
+        GameObject.__init__(self)
+        arcade.View.__init__(self)
         self.labels = labels
         self.show_press_enter = False
         self.press_enter = press_enter
         self.next_view = next_view
-        self.stopwatch = 0
+        self.press_enter_clock = self.new_stopwatch()
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.ENTER:
@@ -25,8 +28,8 @@ class InfoScreen(arcade.View):
         return super().on_key_press(symbol, modifiers)
 
     def on_update(self, delta_time: float):
-        self.stopwatch += delta_time
-        if not self.show_press_enter and self.stopwatch > 2:
+        self.add_all(delta_time)
+        if not self.show_press_enter and self.press_enter_clock.check(2):
             self.show_press_enter = True
 
     def on_draw(self):
