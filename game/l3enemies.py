@@ -10,7 +10,6 @@ from constants import *
 
 
 class AimingTurret(Enemy):
-    RADIUS = 15
     INIT_HP = 4
     COLOR = arcade.csscolor.AQUAMARINE
     SPEED = 300
@@ -22,7 +21,7 @@ class AimingTurret(Enemy):
         elif direction == RIGHT:
             x = -AimingTurret.RADIUS
 
-        super().__init__(AimingTurret.RADIUS, x, y, stage, AimingTurret.INIT_HP)
+        super().__init__(x, y, stage, AimingTurret.INIT_HP)
         self.fire_clock = self.new_stopwatch()
         self.counter = 0
         self.shooting = False
@@ -60,7 +59,6 @@ class AimingTurret(Enemy):
 
 
 class FireBomber(DartingEnemy):
-    RADIUS = 15
     INIT_HP = 11
     COLOR = arcade.csscolor.ORANGE
 
@@ -73,9 +71,7 @@ class FireBomber(DartingEnemy):
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(
-            FireBomber.RADIUS, x, y, stage, FireBomber.INIT_HP, interval=interval
-        )
+        super().__init__(x, y, stage, FireBomber.INIT_HP, interval=interval)
         self.bullet_counts = bullet_counts
         self.shooting = False
         self.bullets_active = []

@@ -14,7 +14,6 @@ class BasicBullet(Bullet):
 
 
 class SeaStar(DartingEnemy):
-    RADIUS = 15
     COLOR = arcade.csscolor.PINK
 
     def __init__(
@@ -27,7 +26,7 @@ class SeaStar(DartingEnemy):
         n_bullets: int = 6,
         double: bool = False,
     ):
-        super().__init__(SeaStar.RADIUS, x, y, stage, 12, interval=interval)
+        super().__init__(x, y, stage, 12, interval=interval)
         self.counter = 0
         self.angle_offset = 0
         self.n_spines = n_spines
@@ -75,7 +74,7 @@ class FallingStar(Enemy):
     angle: float
 
     def __init__(self, x: float, stage: Stage):
-        super().__init__(15, x, HEIGHT + 10, stage, init_hp=FallingStar.INIT_HP)
+        super().__init__(x, HEIGHT + 10, stage, init_hp=FallingStar.INIT_HP)
         self.target_x = WIDTH - x
         self.target_y = -10
         self.fire_clock = self.new_stopwatch()
@@ -104,7 +103,6 @@ class FallingStar(Enemy):
 
 
 class Turret(Enemy):
-    RADIUS = 15
     COLOR = arcade.csscolor.GREENYELLOW
     INIT_HP = 4
     SPEED = 250
@@ -115,7 +113,7 @@ class Turret(Enemy):
         direction: int,
         stage: Stage,
     ):
-        super().__init__(12, 0, y, stage, init_hp=Turret.INIT_HP)
+        super().__init__(-self.RADIUS, y, stage, init_hp=Turret.INIT_HP)
         x: float
         if direction == LEFT:
             x = WIDTH + Turret.RADIUS

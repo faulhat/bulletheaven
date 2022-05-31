@@ -13,23 +13,23 @@ class Stage(arcade.View):
 
 
 class Enemy(arcade.SpriteCircle, GameObject):
+    RADIUS = 15
     COLOR: arcade.Color
 
     def __init__(
         self,
-        radius: int,
         x: float,
         y: float,
         stage: Stage,
         init_hp: int,
         drop_chance: float = 0.2,
     ):
-        arcade.SpriteCircle.__init__(self, radius, self.COLOR)
+        arcade.SpriteCircle.__init__(self, Enemy.RADIUS, self.COLOR)
         GameObject.__init__(self)
 
         self.normal_texture = self.texture
         self.on_hit_texture = arcade.make_circle_texture(
-            radius * 2, arcade.csscolor.RED
+            Enemy.RADIUS * 2, arcade.csscolor.RED
         )
 
         self.set_position(x, y)
@@ -116,14 +116,13 @@ class DartingEnemy(Enemy):
 
     def __init__(
         self,
-        radius: float,
         x: float,
         y: float,
         stage: Stage,
         init_hp: int,
         interval: float = 1,
     ):
-        super().__init__(radius, x, y, stage, init_hp)
+        super().__init__(x, y, stage, init_hp)
         self.next_x, self.next_y = self.position
         self.rand_next()
         self.dart_clock = self.new_stopwatch()

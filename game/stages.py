@@ -4,6 +4,7 @@ from enemy import Boss
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Balloon, Zeppelin
 from l3enemies import AimingTurret, FireBomber, Wyvern
+from bonusenemies import Gatling
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -61,7 +62,7 @@ class L1Stage3(Stage):
         super().__init__(previous)
         self.transition_label.text = "Level One - Stage Three"
         self.sea_stars = arcade.SpriteList()
-        self.dual_wielders = arcade.SpriteList()
+        self.falling_stars = arcade.SpriteList()
         self.new_enemy_clock = self.new_stopwatch()
         self.new_enemy_wait = False
         self.counter = 0
@@ -69,11 +70,11 @@ class L1Stage3(Stage):
     def inc_stage(self):
         self.window.show_view(L1Stage4(self))
 
-    def make_dual_wielders(self):
+    def make_falling_stars(self):
         dual_wielder_a = FallingStar(100, self)
         dual_wielder_b = FallingStar(HEIGHT - 100, self)
-        self.dual_wielders.append(dual_wielder_a)
-        self.dual_wielders.append(dual_wielder_b)
+        self.falling_stars.append(dual_wielder_a)
+        self.falling_stars.append(dual_wielder_b)
 
     def start_stage(self):
         super().start_stage()
@@ -82,7 +83,7 @@ class L1Stage3(Stage):
         self.sea_stars.append(sea_star_a)
         self.sea_stars.append(sea_star_b)
 
-        self.make_dual_wielders()
+        self.make_falling_stars()
 
     def stage_update(self, delta_time: float):
         if self.stage_stopwatch.check_reset(15):
@@ -97,13 +98,13 @@ class L1Stage3(Stage):
                     )
                 )
 
-        if len(self.dual_wielders) == 0:
+        if not self.falling_stars:
             if not self.new_enemy_wait:
                 self.new_enemy_wait = True
                 self.new_enemy_clock.reset()
             elif self.new_enemy_clock.check(2):
                 self.new_enemy_wait = False
-                self.make_dual_wielders()
+                self.make_falling_stars()
 
 
 class L1Stage4(Stage):
@@ -147,7 +148,7 @@ class L1Stage4(Stage):
         self.make_turrets()
 
     def stage_update(self, delta_time: float):
-        if len(self.turrets) == 0:
+        if not self.turrets:
             if not self.turrets_wait:
                 self.turrets_wait = True
                 self.counter += 1
@@ -424,6 +425,19 @@ class L3Boss(BossStage):
     def start_stage(self):
         super().start_stage()
         self.boss = Wyvern(self)
+
+
+class BonusStage(Stage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Bonus Stage One!"
+
+    def inc_sage(self):
+        self.window.show_view(ToEnd(self))
+
+    def start_stage(self):
+        super().start_stage()
+        Gatling(WIDTH + Gatling.RADIUS, HEIGHT + Gatling.RADIUS, self)
 
 
 class ToEnd(Stage):

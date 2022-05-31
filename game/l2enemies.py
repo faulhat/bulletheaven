@@ -79,7 +79,6 @@ class RadialBullet(Bullet):
 
 
 class Balloon(DartingEnemy):
-    RADIUS = 15
     COLOR = arcade.csscolor.ALICE_BLUE
     INIT_HP = 15
 
@@ -92,9 +91,7 @@ class Balloon(DartingEnemy):
         bullet_counts: list[int] = None,
         fire_radii: list[int] = None,
     ):
-        super().__init__(
-            Balloon.RADIUS, x, y, stage, Balloon.INIT_HP, interval=interval
-        )
+        super().__init__(x, y, stage, Balloon.INIT_HP, interval=interval)
         self.bullet_counts = bullet_counts
         self.bullets_active = []
         self.angle = 0
