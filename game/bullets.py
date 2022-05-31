@@ -48,10 +48,11 @@ class Bullet(arcade.SpriteCircle, GameObject):
         )
 
     def on_update(self, delta_time: float):
+        self.add_all(delta_time)
+
         x = self.position[0] + math.cos(self.angle) * self.speed * delta_time
         y = self.position[1] + math.sin(self.angle) * self.speed * delta_time
         self.set_position(x, y)
-
         if self.out_of_bounds():
             self.remove_from_sprite_lists()
 

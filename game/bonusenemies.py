@@ -1,5 +1,5 @@
 import math
-from random import random
+from random import randint, random
 import arcade
 
 from stage import Stage
@@ -73,7 +73,7 @@ class Gatling(DartingEnemy, Boss):
         self.round = 0
 
     def on_update(self, delta_time: float):
-        super().on_update(delta_time)
+        DartingEnemy.on_update(self, delta_time)
 
         if not self.shooting:
             if self.dart_clock.check(self.interval):
@@ -95,3 +95,85 @@ class Gatling(DartingEnemy, Boss):
             self.round += 1
             if self.round == self.n_rounds:
                 self.change_state()
+        
+        self.update_hp_bar()
+
+
+class HomingBullet(BasicBullet):
+    CHANGE_MODE_TIME = 4
+
+    def __init__(self, x: float, y: float, mother: Enemy):
+        angle = math.atan2(mother.position[1] - y, mother.position[0] - x)
+        super().__init__(x, y, angle, mother.stage)
+
+        self.mother = mother
+        self.speed = 150
+        self.color = arcade.csscolor.ORANGE
+        self.interval_clock = self.new_stopwatch()
+        self.change_mode_clock = self.new_stopwatch()
+        self.homing_mode = True
+
+    def on_update(self, delta_time: float):
+        super().on_update(delta_time)
+
+        if self.homing_mode:
+            if self.change_mode_clock.check(HomingBullet.CHANGE_MODE_TIME):
+                self.homing_mode = False
+                self.color = arcade.csscolor.VIOLET
+            elif self.interval_clock.check_reset(0.1):
+                x, y = self.position
+                self.angle = math.atan2(
+                    self.mother.position[1] - y, self.mother.position[0] - x
+                )
+
+
+class Starburst(DartingEnemy, Boss):
+    BOSS_INIT_HP = 45
+    COLOR = arcade.csscolor.LIGHT_PINK
+    NAME = "Starburst"
+
+    def __init__(self, x: float, y: float, stage: Stage, n_bullets: int = 20):
+        DartingEnemy.__init__(self, x, y, stage, Starburst.BOSS_INIT_HP)
+        Boss.__init__(self)
+
+        self.n_bullets = n_bullets
+        self.fire_clock = self.new_stopwatch()
+        self.counter = 0
+    
+    def change_state(self):
+        super().change_state()
+        self.fire_clock.reset()
+        self.counter = 0
+
+    def on_update(self, delta_time: float):
+        DartingEnemy.on_update(self, delta_time)
+
+        if not self.shooting:
+            if self.dart_clock.check(self.interval):
+                self.change_state()
+            else:
+                self.dart_update()
+        elif self.fire_clock.check_reset(self.interval / self.n_bullets):
+            x_axis = randint(0, 1)
+            upper_side = randint(0, 1)
+            x: float
+            y: float
+            if x_axis:
+                x = random() * WIDTH
+                if upper_side:
+                    y = HEIGHT - self.RADIUS
+                else:
+                    y = self.RADIUS
+            else:
+                y = random() * HEIGHT
+                if upper_side:
+                    x = WIDTH - self.RADIUS
+                else:
+                    x = self.RADIUS
+
+            HomingBullet(x, y, self)
+            self.counter += 1
+            if self.counter == self.n_bullets:
+                self.change_state()
+        
+        self.update_hp_bar()
