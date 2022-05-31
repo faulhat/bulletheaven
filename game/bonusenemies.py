@@ -14,6 +14,8 @@ class BouncingBullet(BasicBullet):
     ):
         super().__init__(x, y, angle, stage)
         self.n_bounces = n_bounces
+        self.color = arcade.csscolor.YELLOW
+        self.speed = 300
 
     def on_update(self, delta_time: float):
         if self.n_bounces:
@@ -31,6 +33,10 @@ class BouncingBullet(BasicBullet):
                 next_y = max(self.RADIUS, min(HEIGHT - self.RADIUS, next_y))
                 next_x = x + (next_y - y) / math.sin(self.angle)
                 self.angle = -self.angle
+
+            if not self.n_bounces:
+                self.color = arcade.csscolor.VIOLET
+                self.speed = 400
 
             self.set_position(next_x, next_y)
         else:
@@ -64,7 +70,7 @@ class Gatling(DartingEnemy):
     def on_update(self, delta_time: float):
         super().on_update(delta_time)
 
-        if self.shooting:
+        if not self.shooting:
             if self.dart_clock.check(self.interval):
                 self.change_state()
             else:
