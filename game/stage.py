@@ -148,7 +148,7 @@ class Stage(arcade.View, GameObject):
                 arcade.csscolor.RED,
             )
         elif self.player.serene:
-            if self.player.serene_clock < 6:
+            if self.player.serene_clock.time < 6:
                 arcade.draw_rectangle_filled(
                     self.player.serene_label.position[0]
                     + self.player.serene_label.content_width / 2,

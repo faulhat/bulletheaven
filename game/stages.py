@@ -432,7 +432,7 @@ class BonusStage(Stage):
         super().__init__(previous)
         self.transition_label.text = "Bonus Stage One!"
 
-    def inc_sage(self):
+    def inc_stage(self):
         self.window.show_view(ToEnd(self))
 
     def start_stage(self):

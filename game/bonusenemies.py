@@ -21,20 +21,16 @@ class BouncingBullet(BasicBullet):
             next_x = x + math.cos(self.angle) * delta_time * self.speed
             next_y = y + math.sin(self.angle) * delta_time * self.speed
 
-            bounce = False
             if next_x > WIDTH - self.RADIUS or next_x < self.RADIUS:
+                self.n_bounces -= 1
                 next_x = max(self.RADIUS, min(WIDTH - self.RADIUS, next_x))
                 next_y = y + (next_x - x) / math.cos(self.angle)
-                bounce = True
-
-            if next_y > HEIGHT - self.RADIUS or next_y < self.RADIUS:
+                self.angle = -self.angle + math.pi
+            elif next_y > HEIGHT - self.RADIUS or next_y < self.RADIUS:
+                self.n_bounces -= 1
                 next_y = max(self.RADIUS, min(HEIGHT - self.RADIUS, next_y))
                 next_x = x + (next_y - y) / math.sin(self.angle)
-                bounce = True
-
-            if bounce:
-                self.angle += math.pi
-                self.n_bounces -= 1
+                self.angle = -self.angle
 
             self.set_position(next_x, next_y)
         else:
@@ -42,7 +38,7 @@ class BouncingBullet(BasicBullet):
 
 
 class Gatling(DartingEnemy):
-    INIT_HP = 14
+    INIT_HP = 24
     COLOR = arcade.csscolor.GAINSBORO
 
     def __init__(
@@ -51,7 +47,7 @@ class Gatling(DartingEnemy):
         y: float,
         stage: Stage,
         n_directions: int = 6,
-        n_rounds: int = 3,
+        n_rounds: int = 6,
         interval: float = 1.5,
     ):
         super().__init__(x, y, stage, Gatling.INIT_HP, interval=interval)
@@ -73,7 +69,7 @@ class Gatling(DartingEnemy):
                 self.change_state()
             else:
                 self.dart_update()
-        else:
+        elif self.fire_clock.check_reset(self.interval / self.n_rounds):
             x, y = self.position
             angle = random() * math.pi * 2
             for i in range(self.n_directions):
