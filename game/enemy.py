@@ -1,4 +1,3 @@
-from abc import abstractproperty
 import math
 from random import random
 import arcade

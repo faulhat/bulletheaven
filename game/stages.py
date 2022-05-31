@@ -427,7 +427,7 @@ class L3Boss(BossStage):
         self.boss = Wyvern(self)
 
 
-class BonusStage(Stage):
+class BonusStage1(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Bonus Stage One!"
@@ -437,7 +437,13 @@ class BonusStage(Stage):
 
     def start_stage(self):
         super().start_stage()
-        Gatling(WIDTH + Gatling.RADIUS, HEIGHT + Gatling.RADIUS, self)
+        self.boss = Gatling(WIDTH + Gatling.RADIUS, HEIGHT + Gatling.RADIUS, self)
+
+
+class BonusStage2(BossStage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Bonus Stage Two!"
 
 
 class ToEnd(Stage):

@@ -185,13 +185,9 @@ class Wyvern(FireBomber, Boss):
                 self.counter += 1
                 angle = random() * math.pi * 2
                 x, y = self.position
-                for _ in range(7):
-                    bullet_x = x + math.cos(angle) * (
-                        FireBomber.RADIUS + BasicBullet.RADIUS
-                    )
-                    bullet_y = y + math.sin(angle) * (
-                        FireBomber.RADIUS + BasicBullet.RADIUS
-                    )
+                for _ in range(5):
+                    bullet_x = x + math.cos(angle) * FireBomber.RADIUS
+                    bullet_y = y + math.sin(angle) * FireBomber.RADIUS
                     BasicBullet(bullet_x, bullet_y, angle, self.stage)
                     angle += math.pi * 2 / 5
 

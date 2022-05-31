@@ -15,7 +15,7 @@ class BouncingBullet(BasicBullet):
         super().__init__(x, y, angle, stage)
         self.n_bounces = n_bounces
         self.color = arcade.csscolor.YELLOW
-        self.speed = 300
+        self.speed = 200
 
     def on_update(self, delta_time: float):
         if self.n_bounces:
@@ -36,16 +36,17 @@ class BouncingBullet(BasicBullet):
 
             if not self.n_bounces:
                 self.color = arcade.csscolor.VIOLET
-                self.speed = 400
+                self.speed = 300
 
             self.set_position(next_x, next_y)
         else:
             super().on_update(delta_time)
 
 
-class Gatling(DartingEnemy):
-    INIT_HP = 24
+class Gatling(DartingEnemy, Boss):
+    BOSS_INIT_HP = 40
     COLOR = arcade.csscolor.GAINSBORO
+    NAME = "Gatling"
 
     def __init__(
         self,
@@ -54,9 +55,13 @@ class Gatling(DartingEnemy):
         stage: Stage,
         n_directions: int = 6,
         n_rounds: int = 6,
-        interval: float = 1.5,
+        interval: float = 2,
     ):
-        super().__init__(x, y, stage, Gatling.INIT_HP, interval=interval)
+        DartingEnemy.__init__(
+            self, x, y, stage, Gatling.BOSS_INIT_HP, interval=interval
+        )
+        Boss.__init__(self)
+
         self.fire_clock = self.new_stopwatch()
         self.n_directions = n_directions
         self.n_rounds = n_rounds

@@ -39,5 +39,5 @@ class Instructions(InfoScreen):
                 font_name="PressStart2P",
                 anchor_x="center",
             ),
-            BonusStage(),
+            BonusStage1(),
         )
