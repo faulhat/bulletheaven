@@ -3,6 +3,7 @@ import arcade
 
 from stopwatch import GameObject
 from menus import MenuItem, MenuItems, Menu
+from levelselect import LevelSelect
 from instructions import Instructions
 from constants import *
 
@@ -36,19 +37,25 @@ class MainMenu(Menu, GameObject):
             [
                 MenuItem(
                     "Start!",
-                    lambda _: self.window.show_view(
-                        Instructions(),
-                    ),
-                    start_x=350,
+                    lambda view: view.window.show_view(Instructions()),
+                    start_x=300,
                     start_y=280,
+                    font_size=18,
+                    font_name="PressStart2P",
+                ),
+                MenuItem(
+                    "Select stage...",
+                    lambda view: view.window.show_view(LevelSelect()),
+                    start_x=300,
+                    start_y=240,
                     font_size=18,
                     font_name="PressStart2P",
                 ),
                 MenuItem(
                     "Quit.",
                     lambda _: arcade.exit(),
-                    start_x=350,
-                    start_y=240,
+                    start_x=300,
+                    start_y=200,
                     font_size=18,
                     font_name="PressStart2P",
                 ),
