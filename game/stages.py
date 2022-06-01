@@ -4,7 +4,7 @@ from enemy import Boss
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Balloon, Zeppelin
 from l3enemies import AimingTurret, FireBomber, Wyvern
-from bonusenemies import Gatling, Starburst
+from bonusenemies import Gatling, Camazotz
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -444,13 +444,13 @@ class BonusStage2(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "Bonus Stage Two!"
-    
+
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
-    
+
     def start_stage(self):
         super().start_stage()
-        self.boss = Starburst(-Starburst.RADIUS, HEIGHT + Starburst.RADIUS, self)
+        self.boss = Camazotz(-Camazotz.RADIUS, HEIGHT + Camazotz.RADIUS, self)
 
 
 class ToEnd(Stage):

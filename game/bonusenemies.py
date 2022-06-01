@@ -95,12 +95,12 @@ class Gatling(DartingEnemy, Boss):
             self.round += 1
             if self.round == self.n_rounds:
                 self.change_state()
-        
+
         self.update_hp_bar()
 
 
 class HomingBullet(BasicBullet):
-    CHANGE_MODE_TIME = 4
+    CHANGE_MODE_TIME = 3
 
     def __init__(self, x: float, y: float, mother: Enemy):
         angle = math.atan2(mother.position[1] - y, mother.position[0] - x)
@@ -120,26 +120,36 @@ class HomingBullet(BasicBullet):
             if self.change_mode_clock.check(HomingBullet.CHANGE_MODE_TIME):
                 self.homing_mode = False
                 self.color = arcade.csscolor.VIOLET
-            elif self.interval_clock.check_reset(0.1):
+            elif self.interval_clock.check_reset(0.2):
                 x, y = self.position
                 self.angle = math.atan2(
                     self.mother.position[1] - y, self.mother.position[0] - x
                 )
+                self.speed += 5
 
 
-class Starburst(DartingEnemy, Boss):
+class Camazotz(DartingEnemy, Boss):
     BOSS_INIT_HP = 45
     COLOR = arcade.csscolor.LIGHT_PINK
-    NAME = "Starburst"
+    NAME = "Camazotz"
 
-    def __init__(self, x: float, y: float, stage: Stage, n_bullets: int = 20):
-        DartingEnemy.__init__(self, x, y, stage, Starburst.BOSS_INIT_HP)
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        stage: Stage,
+        n_bullets: int = 20,
+        interval: float = 1.2,
+    ):
+        DartingEnemy.__init__(
+            self, x, y, stage, Camazotz.BOSS_INIT_HP, interval=interval
+        )
         Boss.__init__(self)
 
         self.n_bullets = n_bullets
         self.fire_clock = self.new_stopwatch()
         self.counter = 0
-    
+
     def change_state(self):
         super().change_state()
         self.fire_clock.reset()
@@ -175,5 +185,5 @@ class Starburst(DartingEnemy, Boss):
             self.counter += 1
             if self.counter == self.n_bullets:
                 self.change_state()
-        
+
         self.update_hp_bar()
