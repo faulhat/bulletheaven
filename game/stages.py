@@ -4,7 +4,7 @@ from enemy import Boss
 from l1enemies import SeaStar, FallingStar, Turret, Wormwood
 from l2enemies import Balloon, Zeppelin
 from l3enemies import AimingTurret, FireBomber, Wyvern
-from bonusenemies import Gatling, Camazotz
+from bonusenemies import Gatling, Camazotz, Deluge
 from stage import Stage, BossStage
 from gameover import YouWin
 from constants import *
@@ -430,7 +430,7 @@ class L3Boss(BossStage):
 class BonusStage1(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
-        self.transition_label.text = "Bonus Stage One!"
+        self.transition_label.text = "Bonus Stage One - Gatling"
 
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
@@ -443,7 +443,7 @@ class BonusStage1(BossStage):
 class BonusStage2(BossStage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
-        self.transition_label.text = "Bonus Stage Two!"
+        self.transition_label.text = "Bonus Stage Two - Camazotz"
 
     def inc_stage(self):
         self.window.show_view(ToEnd(self))
@@ -451,6 +451,19 @@ class BonusStage2(BossStage):
     def start_stage(self):
         super().start_stage()
         self.boss = Camazotz(-Camazotz.RADIUS, HEIGHT + Camazotz.RADIUS, self)
+
+
+class BonusStage3(BossStage):
+    def __init__(self, previous: Stage = None):
+        super().__init__(previous)
+        self.transition_label.text = "Bonus Stage Three - Deluge"
+
+    def inc_stage(self):
+        self.window.show_view(ToEnd(self))
+
+    def start_stage(self):
+        super().start_stage()
+        self.boss = Deluge(WIDTH + Deluge.RADIUS, HEIGHT + Deluge.RADIUS, self)
 
 
 class ToEnd(Stage):

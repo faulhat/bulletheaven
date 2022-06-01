@@ -1,3 +1,5 @@
+from black import main
+import mainmenu
 from menus import MenuItem, MenuItems, Menu
 from stage import Stage
 from stages import *
@@ -5,12 +7,14 @@ from constants import *
 
 
 class Levels(MenuItems):
+    DESC_INTERVAL = 30
+
     def __init__(self, stages: list[Stage], start_y: int):
         self.stages = stages
 
         items = []
         for i, stage in enumerate(stages):
-            start_y -= 30
+            start_y -= Levels.DESC_INTERVAL
             items.append(
                 MenuItem(
                     stage.transition_label.text,
@@ -45,6 +49,7 @@ class LevelSelect(Menu):
             L3Boss(),
             BonusStage1(),
             BonusStage2(),
+            BonusStage3(),
         ]
 
         super().__init__()
@@ -56,6 +61,16 @@ class LevelSelect(Menu):
             font_name="PressStart2P",
             font_size=14,
         )
+
+        option_return = MenuItem(
+            "Go back",
+            lambda view: view.window.show_view(mainmenu.MainMenu()),
+            start_x=LevelSelect.LEFT_X,
+            start_y=LevelSelect.START_Y - (1 + len(LEVELS)) * Levels.DESC_INTERVAL,
+            font_name="PressStart2P",
+            font_size=14,
+        )
+        self.options.items.append(option_return)
 
     def on_draw(self):
         self.menu_label.draw()

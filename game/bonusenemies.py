@@ -187,3 +187,97 @@ class Camazotz(DartingEnemy, Boss):
                 self.change_state()
 
         self.update_hp_bar()
+
+
+class GravityBullet(BasicBullet):
+    def __init__(self, x: float, y: float, init_angle: float, mother: Enemy):
+        super().__init__(x, y, init_angle, mother.stage)
+        self.mother = mother
+        self.color = arcade.csscolor.ALICE_BLUE
+        self.released = False
+
+    def release(self):
+        self.color = arcade.csscolor.VIOLET
+        self.released = True
+
+    def on_update(self, delta_time: float):
+        if not self.released:
+            x, y = self.position
+            mother_x, mother_y = self.mother.position
+            angle_to_mother = math.atan2(mother_y - y, mother_x - x)
+            weight_sum = 1 + delta_time
+            self.angle = (self.angle + delta_time * angle_to_mother) / weight_sum
+
+            x += math.cos(self.angle) * delta_time * self.speed
+            y += math.sin(self.angle) * delta_time * self.speed
+            self.set_position(x, y)
+        else:
+            super().on_update(delta_time)
+
+
+class Deluge(DartingEnemy, Boss):
+    BOSS_INIT_HP = 60
+    COLOR = arcade.csscolor.OLIVE_DRAB
+    NAME = "Deluge"
+
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        stage: Stage,
+        n_bullets: int = 20,
+        interval: float = 1.5,
+    ):
+        DartingEnemy.__init__(self, x, y, stage, Deluge.BOSS_INIT_HP, interval=interval)
+        Boss.__init__(self)
+
+        self.n_bullets = n_bullets
+        self.counter = 0
+        self.fire_clock = self.new_stopwatch()
+        self.bullets_active = []
+
+    def change_state(self):
+        super().change_state()
+        self.fire_clock.reset()
+        self.counter = 0
+
+    def on_update(self, delta_time: float):
+        DartingEnemy.on_update(self, delta_time)
+
+        if not self.shooting:
+            if self.dart_clock.check(self.interval):
+                self.change_state()
+            else:
+                self.dart_update()
+        elif self.fire_clock.check_reset(self.interval / self.n_bullets):
+            upper_side = randint(0, 1)
+            bullet_x = random() * WIDTH
+            bullet_y: float
+            if upper_side:
+                bullet_y = -self.RADIUS
+            else:
+                bullet_y = WIDTH + self.RADIUS
+
+            bullet_angle = math.atan2(
+                random() * HEIGHT - bullet_y, WIDTH / 2 - bullet_x
+            )
+            self.bullets_active.append(
+                GravityBullet(bullet_x, bullet_y, bullet_angle, self)
+            )
+
+            self.counter += 1
+            if self.counter == self.n_bullets:
+                for bullet in self.bullets_active:
+                    bullet.release()
+
+                self.bullets_active = []
+                self.change_state()
+
+        self.update_hp_bar()
+    
+    def on_die(self):
+        for bullet in self.bullets_active:
+            bullet.release()
+        
+        self.bullets_active = []
+        super().on_die()
