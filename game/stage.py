@@ -11,6 +11,7 @@ from constants import *
 
 class Stage(arcade.View, GameObject):
     MUSIC = arcade.Sound("assets/music/main.mid.mp3")
+    SERENE_MUSIC = arcade.Sound("assets/music/serene.mid.mp3")
     player: pyglet.media.Player
 
     def __init__(self, other: "Stage" = None):
@@ -34,7 +35,13 @@ class Stage(arcade.View, GameObject):
             self.charms = arcade.SpriteList()
 
             self.keys = set()
-            self.music_player = None
+            self.music_player = self.MUSIC.play()
+            self.music_player.loop = True
+            self.music_player.pause()
+
+            self.serene_player = self.SERENE_MUSIC.play()
+            self.serene_player.loop = True
+            self.serene_player.pause()
         else:
             self.player = other.player
             self.enemies = other.enemies
@@ -42,7 +49,8 @@ class Stage(arcade.View, GameObject):
             self.friendly = other.friendly
             self.charms = other.charms
             self.keys = other.keys
-            self.music_player = other.music_player
+            self.music_player = other.get_music_player()
+            self.serene_player = other.serene_player
 
             self.player.stage = self
             self.player.exit_serene_mode()
@@ -60,6 +68,17 @@ class Stage(arcade.View, GameObject):
         )
         self.in_transition = True
 
+    def get_music_player(self):
+        return self.music_player
+
+    def play_music(self):
+        if self.player.serene:
+            self.music_player.pause()
+            self.serene_player.play()
+        elif self.music_player:
+            self.serene_player.pause()
+            self.music_player.play()
+
     @abstractmethod
     def inc_stage(self):
         pass
@@ -67,9 +86,8 @@ class Stage(arcade.View, GameObject):
     @abstractmethod
     def start_stage(self):
         self.in_transition = False
-        if not self.music_player:
-            self.music_player = self.MUSIC.play()
-            self.music_player.loop = True
+        if not (self.music_player.playing or self.serene_player.playing):
+            self.play_music()
 
     @abstractmethod
     def stage_update(self, delta_time: float):
@@ -80,7 +98,7 @@ class Stage(arcade.View, GameObject):
             if self.music_player:
                 self.music_player.pause()
 
-            self.player.serene_player.pause()
+            self.serene_player.pause()
             self.window.show_view(PauseMenu(self))
             return
 
@@ -103,16 +121,14 @@ class Stage(arcade.View, GameObject):
         if self.player.dead:
             if self.stopwatch.check(0.5):
                 if self.player.n_continues == 0:
-                    if self.music_player:
-                        self.music_player.pause()
-                    
-                    self.player.serene_player.pause()
+                    self.music_player.pause()
+                    self.serene_player.pause()
                     self.window.show_view(GameOver())
                 else:
                     if self.music_player:
                         self.music_player.pause()
                     
-                    self.player.serene_player.pause()
+                    self.serene_player.pause()
                     self.player.dead = False
                     self.window.show_view(ContinueMenu(self))
 
@@ -211,16 +227,21 @@ class BossStage(Stage):
         if previous:
             previous.music_player.delete()
 
-        self.music_player = None
+        self.music_player = self.MUSIC.play()
+        self.music_player.loop = True
+        self.music_player.pause()
+
+    def get_music_player(self):
+        self.music_player.delete()
+        self.music_player = Stage.MUSIC.play()
+        self.music_player.loop = True
+        self.music_player.pause()
+        return self.music_player
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
         if self.boss.hp == 0:
             self.boss.hp_label.text = "Boss Vanquished!"
-
-            if self.music_player:
-                self.music_player.delete()
-                self.music_player = None
 
     def on_draw(self):
         super().on_draw()

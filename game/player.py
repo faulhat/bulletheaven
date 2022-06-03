@@ -13,6 +13,7 @@ class Stage(arcade.View):
     bullets: arcade.SpriteList
     charms: arcade.SpriteList
     music_player: pyglet.media.Player
+    serene_player: pyglet.media.Player
 
 
 class FriendlyBullet(Bullet):
@@ -23,7 +24,6 @@ class FriendlyBullet(Bullet):
 
 
 class Player(arcade.SpriteCircle, GameObject):
-    SERENE_MUSIC = arcade.Sound("assets/music/serene.mid.mp3")
     RADIUS = 12
     SPEED = 350
     INIT_HP = 10
@@ -82,10 +82,6 @@ class Player(arcade.SpriteCircle, GameObject):
         self.serene = False
         self.serene_denied = False
 
-        self.serene_player = self.SERENE_MUSIC.play()
-        self.serene_player.loop = True
-        self.serene_player.pause()
-
     def set_score(self, score: int):
         self.score = score
         self.score_label.text = f"SCORE: {self.score}"
@@ -111,17 +107,15 @@ class Player(arcade.SpriteCircle, GameObject):
             self.exit_serene_denied()
 
     def use_charm(self):
-        self.serene_clock.reset()
         if not self.serene:
+            self.serene_clock.reset()
             if self.n_charms:
                 self.serene = True
                 self.serene_denied = False
                 self.n_charms -= 1
                 self.serene_label.text = "SERENITY MODE"
-                if self.stage.music_player:
-                    self.stage.music_player.pause()
-                    self.serene_player = self.SERENE_MUSIC.play()
-                    self.serene_player.loop = True
+                self.stage.serene_player.seek(.0)
+                self.stage.play_music()
             else:
                 self.serene_denied = True
                 self.serene_label.text = "NO CHARMS!"
@@ -131,10 +125,7 @@ class Player(arcade.SpriteCircle, GameObject):
         if self.serene:
             self.serene = False
             self.serene_label.text = f"CHARMS: {self.n_charms}"
-
-            if self.serene_player:
-                self.serene_player.pause()
-                self.stage.music_player.play()
+            self.stage.play_music()
 
     def exit_serene_denied(self):
         if self.serene_denied:

@@ -470,11 +470,14 @@ class ToEnd(Stage):
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
         self.transition_label.text = "The End."
+        self.music_player.pause()
 
     def inc_stage(self):
         pass
 
     def start_stage(self):
+        self.music_player.delete()
+        self.serene_player.delete()
         self.window.show_view(YouWin())
 
     def stage_update(self, delta_time: float):

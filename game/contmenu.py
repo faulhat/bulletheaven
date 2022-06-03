@@ -56,19 +56,16 @@ class ContinueMenu(Menu):
         self.stage.player.set_score(0)
         self.stage.player.set_hp(Player.INIT_HP)
         self.stage.player.n_continues -= 1
-        if not self.stage.player.serene:
-            self.stage.music_player.play()
-        else:
-            self.stage.player.serene_player.play()
+        self.stage.play_music()
 
         self.window.show_view(self.stage)
 
     def on_key_press(self, symbol: int, modifiers: int):
-        self.stage.on_key_press(symbol, modifiers)
+        self.stage.keys.add(symbol)
         return super().on_key_press(symbol, modifiers)
 
     def on_key_release(self, _symbol: int, _modifiers: int):
-        self.stage.on_key_release(_symbol, _modifiers)
+        self.stage.keys.discard(_symbol)
         return super().on_key_release(_symbol, _modifiers)
 
     def on_draw(self):
