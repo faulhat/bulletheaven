@@ -127,7 +127,7 @@ class Stage(arcade.View, GameObject):
                 else:
                     if self.music_player:
                         self.music_player.pause()
-                    
+
                     self.serene_player.pause()
                     self.player.dead = False
                     self.window.show_view(ContinueMenu(self))

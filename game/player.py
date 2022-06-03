@@ -114,7 +114,7 @@ class Player(arcade.SpriteCircle, GameObject):
                 self.serene_denied = False
                 self.n_charms -= 1
                 self.serene_label.text = "SERENITY MODE"
-                self.stage.serene_player.seek(.0)
+                self.stage.serene_player.seek(0.0)
                 self.stage.play_music()
             else:
                 self.serene_denied = True

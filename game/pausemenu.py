@@ -29,7 +29,7 @@ class PauseMenu(Menu):
                 ),
             ]
         )
-    
+
     def go_back(self):
         self.stage.play_music()
         self.window.show_view(self.stage)

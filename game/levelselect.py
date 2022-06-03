@@ -1,4 +1,3 @@
-from black import main
 import mainmenu
 from menus import MenuItem, MenuItems, Menu
 from stage import Stage

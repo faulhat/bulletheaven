@@ -67,9 +67,9 @@ class Menu(arcade.View):
     def on_draw(self):
         for option in self.options.items:
             option.label.draw()
-    
+
     def show_other(self, other: arcade.View):
         if self.music_player:
             self.music_player.delete()
-        
+
         self.window.show_view(other)

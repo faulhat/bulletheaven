@@ -1,7 +1,7 @@
 import arcade
 
 from infoscreen import InfoScreen
-from stages import *
+from stages import L1Stage1
 
 
 class Instructions(InfoScreen):

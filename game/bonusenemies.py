@@ -274,10 +274,10 @@ class Deluge(DartingEnemy, Boss):
                 self.change_state()
 
         self.update_hp_bar()
-    
+
     def on_die(self):
         for bullet in self.bullets_active:
             bullet.release()
-        
+
         self.bullets_active = []
         super().on_die()

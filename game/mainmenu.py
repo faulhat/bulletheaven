@@ -21,7 +21,7 @@ class MainMenu(Menu, GameObject):
 
     # Seconds between frames
     INTERVAL = 0.5
-    
+
     # Background music
     MUSIC = arcade.Sound("assets/music/title.mid.mp3")
 
