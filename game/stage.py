@@ -1,5 +1,5 @@
 from abc import abstractmethod
-import arcade
+import arcade, pyglet
 
 from contmenu import ContinueMenu
 from stopwatch import GameObject
@@ -10,6 +10,9 @@ from constants import *
 
 
 class Stage(arcade.View, GameObject):
+    MUSIC = arcade.Sound("assets/music/main.mid.mp3")
+    player: pyglet.media.Player
+
     def __init__(self, other: "Stage" = None):
         GameObject.__init__(self)
         arcade.View.__init__(self)
@@ -31,6 +34,7 @@ class Stage(arcade.View, GameObject):
             self.charms = arcade.SpriteList()
 
             self.keys = set()
+            self.music_player = None
         else:
             self.player = other.player
             self.enemies = other.enemies
@@ -38,6 +42,7 @@ class Stage(arcade.View, GameObject):
             self.friendly = other.friendly
             self.charms = other.charms
             self.keys = other.keys
+            self.music_player = other.music_player
 
             self.player.stage = self
             self.player.exit_serene_mode()
@@ -62,6 +67,9 @@ class Stage(arcade.View, GameObject):
     @abstractmethod
     def start_stage(self):
         self.in_transition = False
+        if not self.music_player:
+            self.music_player = self.MUSIC.play()
+            self.music_player.loop = True
 
     @abstractmethod
     def stage_update(self, delta_time: float):
@@ -69,6 +77,10 @@ class Stage(arcade.View, GameObject):
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.X:
+            if self.music_player:
+                self.music_player.pause()
+
+            self.player.serene_player.pause()
             self.window.show_view(PauseMenu(self))
             return
 
@@ -91,8 +103,16 @@ class Stage(arcade.View, GameObject):
         if self.player.dead:
             if self.stopwatch.check(0.5):
                 if self.player.n_continues == 0:
+                    if self.music_player:
+                        self.music_player.pause()
+                    
+                    self.player.serene_player.pause()
                     self.window.show_view(GameOver())
                 else:
+                    if self.music_player:
+                        self.music_player.pause()
+                    
+                    self.player.serene_player.pause()
                     self.player.dead = False
                     self.window.show_view(ContinueMenu(self))
 
@@ -183,15 +203,24 @@ class Boss(arcade.SpriteCircle):
 
 
 class BossStage(Stage):
+    MUSIC = arcade.Sound("assets/music/boss.mid.mp3")
     boss: Boss
 
     def __init__(self, previous: Stage = None):
         super().__init__(previous)
+        if previous:
+            previous.music_player.delete()
+
+        self.music_player = None
 
     def stage_update(self, delta_time: float):
         super().stage_update(delta_time)
         if self.boss.hp == 0:
             self.boss.hp_label.text = "Boss Vanquished!"
+
+            if self.music_player:
+                self.music_player.delete()
+                self.music_player = None
 
     def on_draw(self):
         super().on_draw()

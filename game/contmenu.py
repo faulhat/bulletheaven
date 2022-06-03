@@ -1,4 +1,5 @@
 import arcade
+import pyglet
 
 from player import Player
 from menus import MenuItem, MenuItems, Menu
@@ -8,6 +9,7 @@ from constants import *
 
 class Stage(arcade.View):
     player: Player
+    music_player: pyglet.media.Player
 
 
 class ContinueMenu(Menu):
@@ -54,6 +56,11 @@ class ContinueMenu(Menu):
         self.stage.player.set_score(0)
         self.stage.player.set_hp(Player.INIT_HP)
         self.stage.player.n_continues -= 1
+        if not self.stage.player.serene:
+            self.stage.music_player.play()
+        else:
+            self.stage.player.serene_player.play()
+
         self.window.show_view(self.stage)
 
     def on_key_press(self, symbol: int, modifiers: int):

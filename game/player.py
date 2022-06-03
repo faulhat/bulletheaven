@@ -1,5 +1,6 @@
 import math
 import arcade
+import pyglet
 
 from bullets import Bullet
 from constants import *
@@ -11,6 +12,7 @@ class Stage(arcade.View):
     enemies: arcade.SpriteList
     bullets: arcade.SpriteList
     charms: arcade.SpriteList
+    music_player: pyglet.media.Player
 
 
 class FriendlyBullet(Bullet):
@@ -21,6 +23,7 @@ class FriendlyBullet(Bullet):
 
 
 class Player(arcade.SpriteCircle, GameObject):
+    SERENE_MUSIC = arcade.Sound("assets/music/serene.mid.mp3")
     RADIUS = 12
     SPEED = 350
     INIT_HP = 10
@@ -79,6 +82,10 @@ class Player(arcade.SpriteCircle, GameObject):
         self.serene = False
         self.serene_denied = False
 
+        self.serene_player = self.SERENE_MUSIC.play()
+        self.serene_player.loop = True
+        self.serene_player.pause()
+
     def set_score(self, score: int):
         self.score = score
         self.score_label.text = f"SCORE: {self.score}"
@@ -111,6 +118,10 @@ class Player(arcade.SpriteCircle, GameObject):
                 self.serene_denied = False
                 self.n_charms -= 1
                 self.serene_label.text = "SERENITY MODE"
+                if self.stage.music_player:
+                    self.stage.music_player.pause()
+                    self.serene_player = self.SERENE_MUSIC.play()
+                    self.serene_player.loop = True
             else:
                 self.serene_denied = True
                 self.serene_label.text = "NO CHARMS!"
@@ -120,6 +131,10 @@ class Player(arcade.SpriteCircle, GameObject):
         if self.serene:
             self.serene = False
             self.serene_label.text = f"CHARMS: {self.n_charms}"
+
+            if self.serene_player:
+                self.serene_player.pause()
+                self.stage.music_player.play()
 
     def exit_serene_denied(self):
         if self.serene_denied:

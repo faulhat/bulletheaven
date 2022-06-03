@@ -1,4 +1,5 @@
 import arcade
+import pyglet
 from typing import Callable
 
 
@@ -49,6 +50,7 @@ class MenuItems:
 
 class Menu(arcade.View):
     options: MenuItems
+    music_player: pyglet.media.Player
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.UP:
@@ -65,3 +67,9 @@ class Menu(arcade.View):
     def on_draw(self):
         for option in self.options.items:
             option.label.draw()
+    
+    def show_other(self, other: arcade.View):
+        if self.music_player:
+            self.music_player.delete()
+        
+        self.window.show_view(other)

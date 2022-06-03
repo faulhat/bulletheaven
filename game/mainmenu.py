@@ -21,6 +21,9 @@ class MainMenu(Menu, GameObject):
 
     # Seconds between frames
     INTERVAL = 0.5
+    
+    # Background music
+    MUSIC = arcade.Sound("assets/music/title.mid.mp3")
 
     def __init__(self):
         Menu.__init__(self)
@@ -37,7 +40,7 @@ class MainMenu(Menu, GameObject):
             [
                 MenuItem(
                     "Start!",
-                    lambda view: view.window.show_view(Instructions()),
+                    lambda view: view.show_other(Instructions()),
                     start_x=300,
                     start_y=280,
                     font_size=18,
@@ -45,7 +48,7 @@ class MainMenu(Menu, GameObject):
                 ),
                 MenuItem(
                     "Select stage...",
-                    lambda view: view.window.show_view(LevelSelect()),
+                    lambda view: view.show_other(LevelSelect()),
                     start_x=300,
                     start_y=240,
                     font_size=18,
@@ -66,7 +69,13 @@ class MainMenu(Menu, GameObject):
             "(C) Thomas Faulhaber, 2022", 10, 30, font_size=14, font_name="PressStart2P"
         )
 
+        self.music_player = None
+
     def on_update(self, delta_time: float):
+        if not self.music_player:
+            self.music_player = self.MUSIC.play()
+            self.music_player.loop = True
+
         self.animation_clock.add(delta_time)
         if self.animation_clock.check_reset(MainMenu.INTERVAL):
             self.frame = (self.frame + 1) % len(self.title_frames)
