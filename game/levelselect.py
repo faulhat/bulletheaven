@@ -49,7 +49,7 @@ class LevelSelect(Menu):
             L3Boss(),
             BonusStage1(),
             BonusStage2(),
-            BonusStage3(),
+            # BonusStage3(),
         ]
 
         super().__init__()
